@@ -377,7 +377,7 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v8';
+const SK='atm_v9';
 let S=def();
 
 function def(){return{
@@ -485,44 +485,47 @@ function buildCountrySel(){
 // ════════════════════════════════════════════
 // CATEGORY CHECKBOXES IN PLAYER MODAL
 // ════════════════════════════════════════════
+// Pair left & right categories by matching names so we can show them on one row
 function buildCatCBs(ex){
   const el=$('pcat');el.innerHTML='';
-  const all=[...S.cats.filter(c=>c.arm==='left'),...S.cats.filter(c=>c.arm==='right')];
-  all.forEach(cat=>{
-    const e=ex.find(x=>x.cid===cat.id);
-    const chk=!!e, av=e?e.arm:'both';
+  const leftCats=S.cats.filter(c=>c.arm==='left');
+  const rightCats=S.cats.filter(c=>c.arm==='right');
+  // Build unique name list preserving left-arm order, then append right-only names
+  const names=[...new Set([...leftCats.map(c=>c.name),...rightCats.map(c=>c.name)])];
+  names.forEach(name=>{
+    const lc=leftCats.find(c=>c.name===name);
+    const rc=rightCats.find(c=>c.name===name);
+    const lChecked=lc?!!ex.find(e=>e.cid===lc.id):false;
+    const rChecked=rc?!!ex.find(e=>e.cid===rc.id):false;
     const row=document.createElement('div');
     row.className='ccr';
+    row.style.cssText='display:flex;align-items:center;gap:0;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 12px;margin-bottom:6px';
     row.innerHTML=`
-      <input type="checkbox" id="cb${cat.id}" onchange="togCB(${cat.id})"
-        style="width:16px;height:16px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)" ${chk?'checked':''}>
-      <label for="cb${cat.id}" class="ccl">
-        <span class="tag ${cat.arm==='left'?'tl':'tr'}" style="margin-right:6px">${cat.arm==='left'?'L':'R'}</span>${cat.name}
-      </label>
-      <div id="ca${cat.id}" class="cca ${chk?'on':''}">
-        ${['left','right','both'].map(a=>`
-          <label><input type="radio" name="ra${cat.id}" value="${a}"
-            style="accent-color:var(--accent);width:13px;height:13px" ${av===a?'checked':''}>
-            ${a==='both'?'Both':a==='left'?'Left':'Right'}</label>`).join('')}
+      <div style="flex:1;font-size:13px;font-weight:600;color:var(--text)">${name}</div>
+      <div style="display:flex;gap:12px;flex-shrink:0">
+        ${lc?`<label style="display:flex;align-items:center;gap:5px;cursor:pointer;margin:0;user-select:none">
+          <input type="checkbox" id="cbl${lc.id}"
+            style="width:15px;height:15px;cursor:pointer;accent-color:var(--a2)" ${lChecked?'checked':''}>
+          <span class="tag tl" style="font-size:10px">L</span>
+        </label>`:'<div style="width:52px"></div>'}
+        ${rc?`<label style="display:flex;align-items:center;gap:5px;cursor:pointer;margin:0;user-select:none">
+          <input type="checkbox" id="cbr${rc.id}"
+            style="width:15px;height:15px;cursor:pointer;accent-color:#ff7070" ${rChecked?'checked':''}>
+          <span class="tag tr" style="font-size:10px">R</span>
+        </label>`:'<div style="width:52px"></div>'}
       </div>`;
     el.appendChild(row);
   });
 }
 
-function togCB(id){
-  const cb=$('cb'+id);
-  $('ca'+id).classList.toggle('on',cb.checked);
-}
+function togCB(id){ /* unused — checkboxes are independent */ }
 
 function getEntries(){
   const out=[];
   S.cats.forEach(cat=>{
-    const cb=$('cb'+cat.id);
-    if(cb&&cb.checked){
-      let arm='both';
-      document.querySelectorAll(`input[name="ra${cat.id}"]`).forEach(r=>{if(r.checked)arm=r.value;});
-      out.push({cid:cat.id,arm});
-    }
+    const prefix=cat.arm==='left'?'cbl':'cbr';
+    const cb=$(prefix+cat.id);
+    if(cb&&cb.checked) out.push({cid:cat.id,arm:cat.arm});
   });
   return out;
 }
@@ -614,7 +617,7 @@ function renderTable(){
     const cn=CC.find(x=>x.c===p.country);
     const ctags=(p.entries||[]).map(e=>{
       const cat=S.cats.find(c=>c.id===e.cid)||{name:'?',arm:'left'};
-      const al=e.arm==='both'?'L+R':e.arm==='left'?'L':'R';
+      const al=e.arm==='left'?'L':'R';
       return `<span class="tag ${cat.arm==='left'?'tl':'tr'}" style="margin:1px 2px 1px 0">${cat.name} [${al}]</span>`;
     }).join('')||'—';
     return `<tr>
@@ -678,7 +681,7 @@ const csk=(cid,arm)=>cid+'_'+arm;
 
 function initCS(cid,arm){
   const players=S.players
-    .filter(p=>(p.entries||[]).some(e=>e.cid===cid&&(e.arm===arm||e.arm==='both')))
+    .filter(p=>(p.entries||[]).some(e=>e.cid===cid&&e.arm===arm))
     .map(p=>({id:p.id,w:0,l:0}));
   shuffle(players);
   return{cid,arm,players,wq:[...players.map(p=>p.id)],lq:[],elim:[],cur:null,hist:[],done:false};
@@ -804,7 +807,7 @@ function prefSec(groupIdx){ return groupIdx % 3; }
 function catList(arm){
   const cats=S.cats
     .filter(c=>c.arm===arm)
-    .filter(c=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===c.id&&(e.arm===arm||e.arm==='both'))));
+    .filter(c=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===c.id&&e.arm===arm)));
   // Sort by group then by original order within group
   cats.sort((a,b)=>{
     const ga=catGroup(a.name), gb=catGroup(b.name);
@@ -914,7 +917,7 @@ function renderCatCounts(){
     const cats=S.cats.filter(c=>c.arm===arm);
     if(!cats.length){el.innerHTML='<div style="color:var(--muted);font-size:12px">No categories</div>';return;}
     el.innerHTML=cats.map(cat=>{
-      const count=S.players.filter(p=>(p.entries||[]).some(e=>e.cid===cat.id&&(e.arm===arm||e.arm==='both'))).length;
+      const count=S.players.filter(p=>(p.entries||[]).some(e=>e.cid===cat.id&&e.arm===arm)).length;
       const bar=count>0?`<div style="background:${arm==='left'?'var(--a2)':'#ff7070'};height:4px;border-radius:2px;width:${Math.min(count*8,100)}%;margin-top:3px;opacity:.5"></div>`:'';
       return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
         <div style="flex:1;font-size:12px;color:${count>0?'var(--text)':'var(--muted)'}">${cat.name}</div>
@@ -1171,7 +1174,7 @@ function genRandom(){
   const shuffledCats=[...S.cats].sort(()=>Math.random()-.5);
   const numCats=Math.floor(Math.random()*2)+1; // 1 or 2 cats
   const chosen=shuffledCats.slice(0,numCats);
-  const arms=['left','right','both'];
+  const arms=['left','right'];
   const entries=chosen.map(c=>({cid:c.id,arm:randItem(arms)}));
 
   // Fill the form
@@ -1192,7 +1195,7 @@ function genBulk(){
     const shuffledCats=[...S.cats].sort(()=>Math.random()-.5);
     const numCats=Math.floor(Math.random()*2)+1;
     const chosen=shuffledCats.slice(0,numCats);
-    const arms=['left','right','both'];
+    const arms=['left','right'];
     const entries=chosen.map(c=>({cid:c.id,arm:randItem(arms)}));
     S.players.push({id:S.pid++,bc:String(S.bid++),lastName:ln,firstName:fn,country,photo:null,entries});
   }
@@ -1204,7 +1207,7 @@ function openBarcodes(){
   S.players.forEach(p=>{
     const cats=(p.entries||[]).map(e=>{
       const cat=S.cats.find(c=>c.id===e.cid)||{name:'?'};
-      return cat.name+'['+(e.arm==='both'?'L+R':e.arm==='left'?'L':'R')+']';
+      return cat.name+'['+(e.arm==='left'?'L':'R')+']';
     }).join('<br>');
     const card=document.createElement('div');
     card.style.cssText='background:#fff;color:#000;border:1px solid #ccc;border-radius:6px;padding:12px 14px;min-width:150px;text-align:center;font-family:monospace';
@@ -1225,7 +1228,7 @@ function doExportCSV(){
     const cn=CC.find(x=>x.c===p.country);
     const cats=(p.entries||[]).map(e=>{
       const cat=S.cats.find(c=>c.id===e.cid)||{name:'?'};
-      return cat.name+'['+(e.arm==='both'?'L+R':e.arm==='left'?'L':'R')+']';
+      return cat.name+'['+(e.arm==='left'?'L':'R')+']';
     }).join(' | ');
     rows.push([p.bc,p.lastName,p.firstName,cn?cn.n:'',cats]);
   });
