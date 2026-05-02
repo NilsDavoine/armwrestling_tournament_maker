@@ -8,309 +8,332 @@
 <style>
 :root{
   --bg:#0a0c10;--bg2:#13161e;--bg3:#1c2030;--border:#2a2f42;
-  --accent:#e8c840;--accent2:#3a8cff;--red:#e84040;--green:#30c060;
-  --text:#e8eaf0;--text2:#8890a8;
+  --accent:#e8c840;--a2:#3a8cff;--red:#e84040;--green:#30c060;
+  --text:#e8eaf0;--muted:#8890a8;
   --fd:'Barlow Condensed',sans-serif;--fb:'Barlow',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--fb);font-size:14px;min-height:100vh}
-.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-family:var(--fb);font-size:13px;font-weight:600;transition:all .15s;text-transform:uppercase;letter-spacing:.5px}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn-primary{background:var(--accent);color:#000}.btn-primary:hover:not(:disabled){background:#f0d060}
-.btn-danger{background:var(--red);color:#fff}.btn-danger:hover:not(:disabled){background:#ff5555}
-.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover:not(:disabled){background:var(--border)}
-.btn-green{background:var(--green);color:#000}.btn-green:hover:not(:disabled){background:#40d070}
-.btn-sm{padding:5px 10px;font-size:12px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-family:var(--fb);font-size:13px;font-weight:600;transition:all .15s;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-y{background:var(--accent);color:#000}.btn-y:hover:not(:disabled){background:#f0d060}
+.btn-r{background:var(--red);color:#fff}.btn-r:hover:not(:disabled){background:#ff5555}
+.btn-n{background:var(--bg3);color:var(--text);border:1px solid var(--border)}.btn-n:hover:not(:disabled){background:var(--border)}
+.btn-g{background:var(--green);color:#000}.btn-g:hover:not(:disabled){background:#40d070}
+.btn-b{background:#1a3a5c;color:var(--a2);border:1px solid #2a4a7c}.btn-b:hover:not(:disabled){background:#2a4a7c}
+.sm{padding:5px 10px;font-size:12px}
 input,select{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-family:var(--fb);font-size:13px;width:100%;outline:none;transition:border .15s}
-input:focus,select:focus{border-color:var(--accent2)}
+input:focus,select:focus{border-color:var(--a2)}
 select option{background:var(--bg2)}
-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
+lbl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px}
 .tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
-.tag-left{background:#1a3a5c;color:var(--accent2)}.tag-right{background:#3a1a1a;color:#ff7070}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.tl{background:#1a3a5c;color:var(--a2)}.tr{background:#3a1a1a;color:#ff7070}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px;width:580px;max-width:96vw;max-height:92vh;overflow-y:auto}
 .modal h2{font-family:var(--fd);font-size:22px;font-weight:700;margin-bottom:20px;color:var(--accent)}
-.fg{margin-bottom:12px}.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fg-full{grid-column:1/-1}
-/* ADMIN */
-#admin-app{display:flex;flex-direction:column;height:100vh}
-.adm-head{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.adm-head h1{font-family:var(--fd);font-size:30px;font-weight:900;color:var(--accent);letter-spacing:1px;flex:1}
-.adm-tabs{display:flex;background:var(--bg);padding:12px 20px 0;border-bottom:1px solid var(--border)}
-.adm-tab{padding:8px 20px;cursor:pointer;font-family:var(--fd);font-size:16px;font-weight:700;color:var(--text2);border-bottom:3px solid transparent;text-transform:uppercase;letter-spacing:.5px;transition:all .15s}
-.adm-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.adm-tab:hover{color:var(--text)}
-.adm-body{flex:1;overflow:auto;padding:20px}
-/* TABLE */
+.fg{margin-bottom:12px}.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.gf{grid-column:1/-1}
+
+/* ── ADMIN ── */
+#A{display:flex;flex-direction:column;height:100vh}
+.ah{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ah h1{font-family:var(--fd);font-size:30px;font-weight:900;color:var(--accent);letter-spacing:1px;flex:1}
+.tabs{display:flex;background:var(--bg);padding:12px 20px 0;border-bottom:1px solid var(--border)}
+.tab{padding:8px 20px;cursor:pointer;font-family:var(--fd);font-size:16px;font-weight:700;color:var(--muted);border-bottom:3px solid transparent;text-transform:uppercase;letter-spacing:.5px;transition:all .15s}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent)}.tab:hover{color:var(--text)}
+.ab{flex:1;overflow:auto;padding:20px}
+
+/* ── TABLE ── */
 .tbar{display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
-.twrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+.tw{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse}
 thead{background:var(--bg3)}
-th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
 td{padding:8px 12px;border-top:1px solid var(--border);vertical-align:middle}
 tr:hover td{background:rgba(255,255,255,.02)}
-.thumb{width:36px;height:36px;border-radius:6px;object-fit:cover}
-.thumb-ph{width:36px;height:36px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:18px}
-.bc{font-family:monospace;background:var(--bg3);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:13px;font-weight:700;color:var(--accent2)}
-.flag-img{width:22px;height:15px;object-fit:cover;border-radius:2px;vertical-align:middle}
-/* CATS */
-.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.cat-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px}
-.cat-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.cat-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
-/* TOURNAMENT */
-.tstatus{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px}
-.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
-.scard{background:var(--bg3);border-radius:8px;padding:14px;text-align:center}
-.snum{font-family:var(--fd);font-size:38px;font-weight:900;color:var(--accent)}
-.slbl{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
-.sec3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.seccard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
-.seccard h4{font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:10px;color:var(--accent2)}
-.scan-hint{background:var(--bg3);border:1px dashed var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;color:var(--text2);font-size:13px;margin-top:14px}
-.sdot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.5s infinite;flex-shrink:0}
+.th{width:36px;height:36px;border-radius:6px;object-fit:cover}
+.thp{width:36px;height:36px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px}
+.bc{font-family:monospace;background:var(--bg3);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:13px;font-weight:700;color:var(--a2)}
+.fi{width:22px;height:15px;object-fit:cover;border-radius:2px;vertical-align:middle}
+
+/* ── CATS ── */
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.cbox{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px}
+.crow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.cnum{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+
+/* ── CTRL ── */
+.kbox{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px}
+.kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px}
+.kcard{background:var(--bg3);border-radius:8px;padding:14px;text-align:center}
+.knum{font-family:var(--fd);font-size:38px;font-weight:900;color:var(--accent)}
+.klbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.s3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.sc{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.sc h4{font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:10px;color:var(--a2)}
+.shint{background:var(--bg3);border:1px dashed var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin-top:14px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.5s infinite;flex-shrink:0}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-/* DISPLAY */
-#display-app{display:none;flex-direction:column;height:100vh;overflow:hidden;background:#000}
-.dhead{background:#0a0c10;border-bottom:3px solid var(--accent);padding:0 24px;display:flex;align-items:center;gap:20px;height:56px;flex-shrink:0}
-.dhead h1{font-family:var(--fd);font-size:34px;font-weight:900;color:var(--accent);letter-spacing:2px}
-.arm-badge{font-family:var(--fd);font-size:18px;font-weight:700;padding:4px 16px;border-radius:4px;text-transform:uppercase;letter-spacing:2px}
-.arm-l{background:#1a3a5c;color:var(--accent2)}.arm-r{background:#3a1a1a;color:#ff8888}
-.dbody{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);overflow:hidden}
-.dsec{background:#0d0f15;display:flex;flex-direction:column;overflow:hidden}
+.log-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-size:12px;font-family:monospace;color:var(--muted);margin-top:16px}
+.log-box p{padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.log-box p:last-child{border:none}
+
+/* ── DISPLAY ── */
+#D{display:none;flex-direction:column;height:100vh;overflow:hidden;background:#000}
+.dh{background:#0a0c10;border-bottom:3px solid var(--accent);padding:0 24px;display:flex;align-items:center;gap:20px;height:56px;flex-shrink:0}
+.dh h1{font-family:var(--fd);font-size:34px;font-weight:900;color:var(--accent);letter-spacing:2px}
+.arm-b{font-family:var(--fd);font-size:18px;font-weight:700;padding:4px 16px;border-radius:4px;text-transform:uppercase;letter-spacing:2px}
+.abl{background:#1a3a5c;color:var(--a2)}.abr{background:#3a1a1a;color:#ff8888}
+.db{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);overflow:hidden}
+.ds{background:#0d0f15;display:flex;flex-direction:column;overflow:hidden}
 .dsh{background:#13161e;padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
-.dsh-name{font-family:var(--fd);font-size:22px;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:1px}
-.dsh-sub{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
-.dsmatch{flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:16px 10px}
-.dsplayer{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;min-width:0;padding:0 4px}
-.dsphoto{width:88px;height:100px;object-fit:cover;border-radius:8px;border:2px solid var(--border)}
-.dsphoto-ph{width:88px;height:100px;border-radius:8px;background:var(--bg3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--border)}
-.dsflag{width:36px;height:24px;object-fit:cover;border-radius:3px;border:1px solid var(--border)}
-.dsname{font-family:var(--fd);font-size:16px;font-weight:700;text-align:center;line-height:1.1;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
-.dsname span{font-weight:400;font-size:12px;display:block}
-.dslosses{display:flex;gap:4px;margin-top:2px}
-.dsloss{width:11px;height:11px;border-radius:50%;background:var(--border)}.dsloss.hit{background:var(--red)}
+.dshn{font-family:var(--fd);font-size:22px;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:1px}
+.dshs{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.dsm{flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:16px 10px}
+.dsp{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;min-width:0;padding:0 4px}
+.dspho{width:88px;height:100px;object-fit:cover;border-radius:8px;border:2px solid var(--border)}
+.dsphp{width:88px;height:100px;border-radius:8px;background:var(--bg3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--border)}
+.dsfl{width:36px;height:24px;object-fit:cover;border-radius:3px;border:1px solid var(--border)}
+.dsnm{font-family:var(--fd);font-size:16px;font-weight:700;text-align:center;line-height:1.1;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.dsnm span{font-weight:400;font-size:12px;display:block}
+.dsls{display:flex;gap:4px;margin-top:2px}
+.dsl{width:11px;height:11px;border-radius:50%;background:var(--border)}.dsl.h{background:var(--red)}
 .dsvs{font-family:var(--fd);font-size:32px;font-weight:900;color:rgba(255,255,255,.12);letter-spacing:3px;flex-shrink:0;margin:0 4px}
-.dsup{padding:6px 12px;border-top:1px solid var(--border);flex-shrink:0}
-.dsup-title{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-.dsup-item{font-size:12px;color:var(--text2);padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dsrank{border-top:1px solid var(--border);padding:8px 12px;flex-shrink:0}
-.dsrank-title{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
-.dsrank-row{display:flex;align-items:center;gap:7px;padding:3px 0;border-top:1px solid rgba(255,255,255,.04);font-size:12px}
-.dsrp{font-family:var(--fd);font-size:15px;font-weight:700;width:20px;color:var(--text2);flex-shrink:0;text-align:center}
-.dsrp.p1{color:var(--accent)}.dsrp.p2{color:#aaa}.dsrp.p3{color:#cd7f32}
-.dsrn{font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dsrn-empty{color:rgba(255,255,255,.12);font-style:italic;font-size:11px}
-.dsdone{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;padding:24px}
-.dsdone-icon{font-size:52px}.dsdone-txt{font-family:var(--fd);font-size:26px;font-weight:900;color:var(--green);text-transform:uppercase;letter-spacing:2px;text-align:center}
-.dsdone-winner{font-family:var(--fd);font-size:18px;font-weight:700;color:var(--accent);text-align:center;text-transform:uppercase;letter-spacing:1px}
-.dswait{display:flex;align-items:center;justify-content:center;flex:1;color:rgba(255,255,255,.1);font-family:var(--fd);font-size:18px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
-.scan-flash{position:fixed;inset:0;background:rgba(56,200,255,.15);pointer-events:none;z-index:9999;opacity:0;transition:opacity .08s}
-.scan-flash.on{opacity:1}
+.dup{padding:6px 12px;border-top:1px solid var(--border);flex-shrink:0}
+.dupt{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.dupi{font-size:12px;color:var(--muted);padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drk{border-top:1px solid var(--border);padding:8px 12px;flex-shrink:0}
+.drkt{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.drkr{display:flex;align-items:center;gap:7px;padding:3px 0;border-top:1px solid rgba(255,255,255,.04);font-size:12px}
+.drkp{font-family:var(--fd);font-size:15px;font-weight:700;width:20px;color:var(--muted);flex-shrink:0;text-align:center}
+.drkp.r1{color:var(--accent)}.drkp.r2{color:#aaa}.drkp.r3{color:#cd7f32}
+.drkn{font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drke{color:rgba(255,255,255,.12);font-style:italic;font-size:11px}
+.done{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;padding:24px}
+.done-ic{font-size:52px}
+.done-tx{font-family:var(--fd);font-size:26px;font-weight:900;color:var(--green);text-transform:uppercase;letter-spacing:2px;text-align:center}
+.done-wn{font-family:var(--fd);font-size:18px;font-weight:700;color:var(--accent);text-align:center;text-transform:uppercase;letter-spacing:1px}
+.wait{display:flex;align-items:center;justify-content:center;flex:1;color:rgba(255,255,255,.1);font-family:var(--fd);font-size:18px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.sfx{position:fixed;inset:0;background:rgba(56,200,255,.15);pointer-events:none;z-index:9999;opacity:0;transition:opacity .08s}
+.sfx.on{opacity:1}
+/* Full tournament done overlay on display */
+.td-over{position:absolute;inset:0;background:#0a0c10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:50}
+.td-over h2{font-family:var(--fd);font-size:64px;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:4px}
+.td-over p{font-family:var(--fd);font-size:22px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+
 #webcam-video{width:100%;border-radius:8px;background:#000}
 #webcam-canvas{display:none}
-.cc-row{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:6px}
-.cc-mlbl{flex:1;cursor:pointer;margin:0;font-size:13px;font-weight:600;color:var(--text);text-transform:none;letter-spacing:0}
-.cc-arms{display:none;gap:10px}.cc-arms.show{display:flex}
-.cc-arms label{display:flex;align-items:center;gap:3px;cursor:pointer;margin:0;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
-@media(max-width:900px){.cat-grid,.sec3,.sgrid{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.cat-grid,.sec3,.sgrid{grid-template-columns:1fr}}
+.ccr{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:6px}
+.ccl{flex:1;cursor:pointer;margin:0;font-size:13px;font-weight:600;color:var(--text);text-transform:none;letter-spacing:0}
+.cca{display:none;gap:10px}.cca.on{display:flex}
+.cca label{display:flex;align-items:center;gap:3px;cursor:pointer;margin:0;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+@media(max-width:900px){.cgrid,.s3,.kgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.cgrid,.s3,.kgrid{grid-column:1}}
 </style>
 </head>
 <body>
 
-<!-- ══════════════ ADMIN ══════════════ -->
-<div id="admin-app">
-  <div class="adm-head">
+<!-- ══════════ ADMIN ══════════ -->
+<div id="A">
+  <div class="ah">
     <h1>⚡ TOURNAMENT MANAGER</h1>
-    <button class="btn btn-secondary" onclick="openDisplayWindow()">📺 Open Display</button>
-    <button class="btn btn-green" id="btn-start-hdr" style="display:none" onclick="startTournament()">▶ Start Tournament</button>
-    <button class="btn btn-danger" id="btn-reset-hdr" style="display:none" onclick="resetTournament()">↺ Reset</button>
+    <button class="btn btn-n" onclick="openDisplay()">📺 Open Display</button>
+    <button class="btn btn-g" id="hdr-start" style="display:none" onclick="startTournament()">▶ Start</button>
+    <button class="btn btn-r" id="hdr-reset" style="display:none" onclick="resetTournament()">↺ Reset</button>
   </div>
-  <div class="adm-tabs">
-    <div class="adm-tab active" onclick="showTab('reg')">Registrations</div>
-    <div class="adm-tab" onclick="showTab('cats')">Categories</div>
-    <div class="adm-tab" onclick="showTab('ctrl')">Tournament Control</div>
+  <div class="tabs">
+    <div class="tab on" onclick="showTab('reg')">Registrations</div>
+    <div class="tab" onclick="showTab('cats')">Categories</div>
+    <div class="tab" onclick="showTab('ctrl')">Tournament Control</div>
   </div>
-  <div class="adm-body">
+  <div class="ab">
 
-    <!-- REGISTRATIONS TAB -->
-    <div id="tab-reg">
+    <!-- ── REGISTRATIONS ── -->
+    <div id="t-reg">
       <div class="tbar">
-        <button class="btn btn-primary" onclick="openAddPlayer()">+ Add Player</button>
-        <button class="btn btn-secondary" onclick="exportCSV()">⬇ Export CSV</button>
-        <button class="btn btn-secondary" onclick="openPrintBarcodes()">🖨 Print Barcodes</button>
-        <span id="plbl" style="color:var(--text2);font-size:12px;margin-left:auto">0 players</span>
+        <button class="btn btn-y" onclick="openAdd()">+ Add Player</button>
+        <button class="btn btn-n" onclick="doExportCSV()">⬇ Export CSV</button>
+        <button class="btn btn-n" onclick="openBarcodes()">🖨 Print Barcodes</button>
+        <span id="plbl" style="color:var(--muted);font-size:12px;margin-left:auto">0 players</span>
       </div>
-      <div class="twrap">
+      <div class="tw">
         <table>
           <thead><tr>
             <th>Barcode</th><th>Photo</th><th>Last Name</th><th>First Name</th>
             <th>Categories</th><th>Country</th><th>Actions</th>
           </tr></thead>
-          <tbody id="ptbody"></tbody>
+          <tbody id="ptb"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- CATEGORIES TAB -->
-    <div id="tab-cats" style="display:none">
-      <p style="color:var(--text2);font-size:12px;margin-bottom:16px">Add, rename and remove categories freely. A category that has registered players cannot be deleted.</p>
-      <div class="cat-grid">
-        <div class="cat-box">
+    <!-- ── CATEGORIES ── -->
+    <div id="t-cats" style="display:none">
+      <p style="color:var(--muted);font-size:12px;margin-bottom:16px">Add, rename or delete categories. A category with registered players cannot be deleted.</p>
+      <div class="cgrid">
+        <div class="cbox">
           <div style="display:flex;align-items:center;margin-bottom:14px">
-            <h3 style="font-family:var(--fd);font-size:18px;font-weight:700;color:var(--accent2);flex:1">Left Arm</h3>
-            <button class="btn btn-secondary btn-sm" id="btn-add-left" onclick="addCategory('left')">+ Add</button>
+            <h3 style="font-family:var(--fd);font-size:18px;font-weight:700;color:var(--a2);flex:1">Left Arm</h3>
+            <button class="btn btn-n sm" id="addL" onclick="addCat('left')">+ Add</button>
           </div>
-          <div id="cats-left"></div>
+          <div id="cl"></div>
         </div>
-        <div class="cat-box">
+        <div class="cbox">
           <div style="display:flex;align-items:center;margin-bottom:14px">
             <h3 style="font-family:var(--fd);font-size:18px;font-weight:700;color:#ff8888;flex:1">Right Arm</h3>
-            <button class="btn btn-secondary btn-sm" id="btn-add-right" onclick="addCategory('right')">+ Add</button>
+            <button class="btn btn-n sm" id="addR" onclick="addCat('right')">+ Add</button>
           </div>
-          <div id="cats-right"></div>
+          <div id="cr"></div>
         </div>
       </div>
     </div>
 
-    <!-- TOURNAMENT CONTROL TAB -->
-    <div id="tab-ctrl" style="display:none">
-      <div class="tstatus">
+    <!-- ── CONTROL ── -->
+    <div id="t-ctrl" style="display:none">
+      <div class="kbox">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
           <h3 style="font-family:var(--fd);font-size:20px;font-weight:700">Tournament Status</h3>
-          <span id="phase-badge" class="tag" style="background:#1a2a1a;color:var(--green)">SETUP</span>
-          <span id="arm-ctrl" class="tag tag-left" style="display:none">LEFT ARM</span>
+          <span id="pbadge" class="tag" style="background:#1a2a1a;color:var(--green)">SETUP</span>
+          <span id="abadge" class="tag tl" style="display:none">LEFT ARM</span>
         </div>
-        <div class="sgrid">
-          <div class="scard"><div class="snum" id="st-players">0</div><div class="slbl">Players</div></div>
-          <div class="scard"><div class="snum" id="st-matches">0</div><div class="slbl">Matches played</div></div>
-          <div class="scard"><div class="snum" id="st-done">0</div><div class="slbl">Categories done</div></div>
-          <div class="scard"><div class="snum" id="st-active">0</div><div class="slbl">Active sections</div></div>
+        <div class="kgrid">
+          <div class="kcard"><div class="knum" id="stp">0</div><div class="klbl">Players</div></div>
+          <div class="kcard"><div class="knum" id="stm">0</div><div class="klbl">Matches played</div></div>
+          <div class="kcard"><div class="knum" id="std">0</div><div class="klbl">Categories done</div></div>
+          <div class="kcard"><div class="knum" id="sta">0</div><div class="klbl">Active sections</div></div>
         </div>
         <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-          <button class="btn btn-green" id="btn-start" onclick="startTournament()">▶ Start Tournament</button>
-          <button class="btn btn-primary" id="btn-rightarm" style="display:none" onclick="switchToRightArm()">→ Switch to Right Arm</button>
-          <button class="btn btn-danger" id="btn-reset" style="display:none" onclick="resetTournament()">↺ Full Reset</button>
+          <button class="btn btn-g" id="btn-start" onclick="startTournament()">▶ Start Tournament</button>
+          <button class="btn btn-y" id="btn-switch" style="display:none" onclick="switchArm()">→ Switch to Right Arm</button>
+          <button class="btn btn-r" id="btn-reset" style="display:none" onclick="resetTournament()">↺ Full Reset</button>
         </div>
-        <div class="scan-hint">
-          <div class="sdot"></div>
-          <span>Barcode scanner active — scan a player's barcode to declare them winner of the current match in their section.</span>
+        <div class="shint">
+          <div class="dot"></div>
+          <span>Barcode scanner active — scan a player's barcode to declare them winner. Or use the manual buttons below.</span>
         </div>
       </div>
-      <div class="sec3">
-        <div class="seccard"><h4>Section 1</h4><div id="ctrl-s0">Waiting...</div></div>
-        <div class="seccard"><h4>Section 2</h4><div id="ctrl-s1">Waiting...</div></div>
-        <div class="seccard"><h4>Section 3</h4><div id="ctrl-s2">Waiting...</div></div>
+
+      <div class="s3" id="s3"></div>
+
+      <div>
+        <h4 style="font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:8px;color:var(--muted)">Match Log</h4>
+        <div class="log-box" id="logbox"><p style="color:var(--muted)">No matches yet.</p></div>
       </div>
     </div>
 
   </div>
 </div>
 
-<!-- ══════════════ DISPLAY ══════════════ -->
-<div id="display-app">
-  <div class="dhead">
+<!-- ══════════ DISPLAY ══════════ -->
+<div id="D">
+  <div class="dh">
     <h1>⚡ ARMWRESTLING TOURNAMENT</h1>
-    <span id="darm" class="arm-badge arm-l">LEFT ARM</span>
+    <span id="darm" class="arm-b abl">LEFT ARM</span>
     <div style="flex:1"></div>
-    <span id="dclock" style="font-family:var(--fd);font-size:14px;color:var(--text2);letter-spacing:1px"></span>
+    <span id="dclk" style="font-family:var(--fd);font-size:14px;color:var(--muted);letter-spacing:1px"></span>
   </div>
-  <div class="dbody">
-    <div class="dsec" id="ds0"></div>
-    <div class="dsec" id="ds1"></div>
-    <div class="dsec" id="ds2"></div>
+  <div style="position:relative;flex:1;display:flex;overflow:hidden">
+    <div class="db" id="db">
+      <div class="ds" id="ds0"></div>
+      <div class="ds" id="ds1"></div>
+      <div class="ds" id="ds2"></div>
+    </div>
+    <div class="td-over" id="td-over" style="display:none">
+      <div style="font-size:80px">🏆</div>
+      <h2>Tournament Complete!</h2>
+      <p>All categories finished</p>
+    </div>
   </div>
-  <div id="scan-flash" class="scan-flash"></div>
+  <div id="sfx" class="sfx"></div>
 </div>
 
-<!-- ══════════════ MODALS ══════════════ -->
+<!-- ══════════ MODALS ══════════ -->
 
 <!-- Add/Edit Player -->
-<div id="modal-player" class="modal-overlay" style="display:none" onclick="closeOut(event,'modal-player')">
+<div id="m-player" class="ov" style="display:none" onclick="closeOut(event,'m-player')">
   <div class="modal">
-    <h2 id="mp-title">Add Player</h2>
-    <div class="fg2">
-      <div class="fg"><label>Last Name *</label><input id="p-ln" placeholder="SMITH" oninput="this.value=this.value.toUpperCase()"></div>
-      <div class="fg"><label>First Name *</label><input id="p-fn" placeholder="John"></div>
-      <div class="fg fg-full"><label>Country</label><select id="p-co"></select></div>
-      <div class="fg fg-full">
-        <label>Categories & Arms * <span style="font-size:10px;color:var(--text2);text-transform:none;letter-spacing:0;font-weight:400"> — check one or more, then choose Left / Right / Both</span></label>
-        <div id="p-cats-list" style="max-height:230px;overflow-y:auto;padding-right:2px"></div>
+    <h2 id="mptitle">Add Player</h2>
+    <div class="g2">
+      <div class="fg"><lbl>Last Name *</lbl><input id="pln" placeholder="SMITH" oninput="this.value=this.value.toUpperCase()"></div>
+      <div class="fg"><lbl>First Name *</lbl><input id="pfn" placeholder="John"></div>
+      <div class="fg gf"><lbl>Country</lbl><select id="pco"></select></div>
+      <div class="fg gf">
+        <lbl>Categories & Arms * <span style="font-size:10px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400">— check one or more, choose Left / Right / Both</span></lbl>
+        <div id="pcat" style="max-height:220px;overflow-y:auto;padding-right:2px"></div>
       </div>
-      <div class="fg fg-full">
-        <label>Photo</label>
+      <div class="fg gf">
+        <lbl>Photo</lbl>
         <div style="display:flex;gap:12px;align-items:flex-start">
-          <div id="p-photo-box" style="width:72px;height:84px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden;flex-shrink:0">👤</div>
+          <div id="pphbox" style="width:72px;height:84px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden;flex-shrink:0">👤</div>
           <div style="display:flex;flex-direction:column;gap:7px">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('p-file').click()">📁 Browse file</button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="openWebcam()">📷 Webcam</button>
-            <button type="button" class="btn btn-danger btn-sm" id="p-clear-photo" onclick="clearPhoto()" style="display:none">✕ Remove</button>
-            <input id="p-file" type="file" accept="image/*" style="display:none" onchange="handleFile(event)">
+            <button type="button" class="btn btn-n sm" onclick="document.getElementById('pfile').click()">📁 Browse</button>
+            <button type="button" class="btn btn-n sm" onclick="openCam()">📷 Webcam</button>
+            <button type="button" class="btn btn-r sm" id="pclr" onclick="clearPhoto()" style="display:none">✕ Remove</button>
+            <input id="pfile" type="file" accept="image/*" style="display:none" onchange="onFile(event)">
           </div>
         </div>
       </div>
     </div>
     <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
-      <button class="btn btn-secondary" onclick="closeModal('modal-player')">Cancel</button>
-      <button class="btn btn-primary" onclick="savePlayer()">Save Player</button>
+      <button class="btn btn-n" onclick="closeM('m-player')">Cancel</button>
+      <button class="btn btn-y" onclick="savePlayer()">Save Player</button>
     </div>
   </div>
 </div>
 
 <!-- Webcam -->
-<div id="modal-webcam" class="modal-overlay" style="display:none">
+<div id="m-cam" class="ov" style="display:none">
   <div class="modal" style="width:460px">
     <h2>Webcam Capture</h2>
-    <video id="webcam-video" autoplay playsinline></video>
-    <canvas id="webcam-canvas"></canvas>
+    <video id="wcv" autoplay playsinline></video>
+    <canvas id="wcc" style="display:none"></canvas>
     <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end">
-      <button class="btn btn-secondary" onclick="closeWebcam()">Cancel</button>
-      <button class="btn btn-primary" onclick="captureWebcam()">📸 Capture</button>
+      <button class="btn btn-n" onclick="closeCam()">Cancel</button>
+      <button class="btn btn-y" onclick="captureCam()">📸 Capture</button>
     </div>
   </div>
 </div>
 
 <!-- Confirm -->
-<div id="modal-confirm" class="modal-overlay" style="display:none">
+<div id="m-confirm" class="ov" style="display:none">
   <div class="modal" style="width:380px">
-    <h2 id="mc-title">Confirm</h2>
-    <p id="mc-msg" style="color:var(--text2);margin-bottom:20px;line-height:1.6"></p>
+    <h2 id="cftitle">Confirm</h2>
+    <p id="cfmsg" style="color:var(--muted);margin-bottom:20px;line-height:1.6"></p>
     <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn btn-secondary" onclick="closeModal('modal-confirm')">Cancel</button>
-      <button class="btn btn-primary" id="mc-ok">OK</button>
+      <button class="btn btn-n" onclick="closeM('m-confirm')">Cancel</button>
+      <button class="btn btn-y" id="cfok">OK</button>
     </div>
   </div>
 </div>
 
 <!-- Category Winner -->
-<div id="modal-winner" class="modal-overlay" style="display:none">
+<div id="m-winner" class="ov" style="display:none">
   <div class="modal" style="width:400px;text-align:center">
     <div style="font-size:56px;margin-bottom:8px">🏆</div>
     <h2 style="font-size:32px;text-align:center">WINNER!</h2>
-    <div id="mw-name" style="font-family:var(--fd);font-size:26px;font-weight:700;color:#fff;margin:8px 0 4px"></div>
-    <div id="mw-cat" style="color:var(--text2);font-size:13px;margin-bottom:20px"></div>
-    <button class="btn btn-primary" onclick="closeModal('modal-winner')" style="width:100%;justify-content:center">Continue →</button>
+    <div id="wname" style="font-family:var(--fd);font-size:26px;font-weight:700;color:#fff;margin:8px 0 4px"></div>
+    <div id="wcat" style="color:var(--muted);font-size:13px;margin-bottom:20px"></div>
+    <button class="btn btn-y" onclick="closeM('m-winner')" style="width:100%;justify-content:center">Continue →</button>
   </div>
 </div>
 
 <!-- Print Barcodes -->
-<div id="modal-barcodes" class="modal-overlay" style="display:none" onclick="closeOut(event,'modal-barcodes')">
+<div id="m-bc" class="ov" style="display:none" onclick="closeOut(event,'m-bc')">
   <div class="modal" style="width:700px">
     <h2>Print Barcodes</h2>
-    <p style="color:var(--text2);font-size:12px;margin-bottom:16px">Print this sheet, cut the cards, and give each player their card. Scan the number with a USB barcode scanner during the tournament.</p>
-    <div id="bc-cards" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px"></div>
+    <p style="color:var(--muted);font-size:12px;margin-bottom:16px">Cut and give each player their card. Scan the number during the tournament with a USB barcode scanner.</p>
+    <div id="bccards" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px"></div>
     <div style="display:flex;justify-content:flex-end;gap:10px">
-      <button class="btn btn-secondary" onclick="closeModal('modal-barcodes')">Close</button>
-      <button class="btn btn-primary" onclick="window.print()">🖨 Print</button>
+      <button class="btn btn-n" onclick="closeM('m-bc')">Close</button>
+      <button class="btn btn-y" onclick="window.print()">🖨 Print</button>
     </div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // COUNTRIES
-// ═══════════════════════════════════════════
-const COUNTRIES=[
+// ════════════════════════════════════════════
+const CC=[
   {c:'AF',n:'Afghanistan'},{c:'AL',n:'Albania'},{c:'DZ',n:'Algeria'},{c:'AD',n:'Andorra'},
   {c:'AO',n:'Angola'},{c:'AR',n:'Argentina'},{c:'AM',n:'Armenia'},{c:'AU',n:'Australia'},
   {c:'AT',n:'Austria'},{c:'AZ',n:'Azerbaijan'},{c:'BH',n:'Bahrain'},{c:'BY',n:'Belarus'},
@@ -338,638 +361,675 @@ const COUNTRIES=[
   {c:'GB',n:'United Kingdom'},{c:'US',n:'United States'},{c:'UZ',n:'Uzbekistan'},
   {c:'VN',n:'Vietnam'},{c:'YE',n:'Yemen'}
 ];
-const flagUrl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
+const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // STATE
-// players[]: {id,barcode,lastName,firstName,country,photo,entries:[{catId,arm:'left'|'right'|'both'}]}
-// categories[]: {id,arm:'left'|'right',name}
-// tournament: {phase,currentArm,locked,catQueue:[{catId,arm}],sections:[{catId,arm,key,done}|null],catsDone:[]}
-// catStates: {"catId_arm": {catId,arm,players,winnerQ,loserQ,eliminated,currentMatch,matchHistory,done}}
-// ═══════════════════════════════════════════
-const SK='arm_tm_v4';
-let S=mkState();
+// players[]: {id,bc,lastName,firstName,country,photo,entries:[{cid,arm}]}
+// categories[]: {id,arm,name}
+// T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
+// CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
+// ════════════════════════════════════════════
+const SK='atm_v5';
+let S=def();
 
-function mkState(){
-  return{
-    players:[],
-    categories:[
-      {id:0,arm:'left',name:'Sub-juniors -75kg'},{id:1,arm:'left',name:'Juniors -75kg'},
-      {id:2,arm:'left',name:'Amateurs -75kg'},{id:3,arm:'left',name:'Seniors -75kg'},
-      {id:4,arm:'left',name:'Masters -75kg'},{id:5,arm:'left',name:'Professionals -75kg'},
-      {id:6,arm:'left',name:'Open -75kg'},
-      {id:7,arm:'right',name:'Sub-juniors -75kg'},{id:8,arm:'right',name:'Juniors -75kg'},
-      {id:9,arm:'right',name:'Amateurs -75kg'},{id:10,arm:'right',name:'Seniors -75kg'},
-      {id:11,arm:'right',name:'Masters -75kg'},{id:12,arm:'right',name:'Professionals -75kg'},
-      {id:13,arm:'right',name:'Open -75kg'},
-    ],
-    tournament:{phase:'setup',currentArm:'left',locked:false,catQueue:[],sections:[null,null,null],catsDone:[]},
-    catStates:{},
-    nextPid:1,nextBarcode:1001,nextCatId:14,
-    _rightList:null
-  };
-}
+function def(){return{
+  players:[],
+  cats:[
+    {id:0,arm:'left',name:'Sub-juniors -75kg'},{id:1,arm:'left',name:'Juniors -75kg'},
+    {id:2,arm:'left',name:'Amateurs -75kg'},{id:3,arm:'left',name:'Seniors -75kg'},
+    {id:4,arm:'left',name:'Masters -75kg'},{id:5,arm:'left',name:'Professionals -75kg'},
+    {id:6,arm:'left',name:'Open -75kg'},
+    {id:7,arm:'right',name:'Sub-juniors -75kg'},{id:8,arm:'right',name:'Juniors -75kg'},
+    {id:9,arm:'right',name:'Amateurs -75kg'},{id:10,arm:'right',name:'Seniors -75kg'},
+    {id:11,arm:'right',name:'Masters -75kg'},{id:12,arm:'right',name:'Professionals -75kg'},
+    {id:13,arm:'right',name:'Open -75kg'},
+  ],
+  T:{phase:'setup',curArm:'left',locked:false,queue:[],secs:[null,null,null],done:[]},
+  CS:{},
+  pid:1,bid:1001,cid:14,
+  log:[],       // [{ts,txt}]
+  _rlist:null   // saved right arm list
+};}
 
-// ═══════════════════════════════════════════
-// PERSISTENCE + BROADCAST
-// ═══════════════════════════════════════════
-function persist(){
+function save(){
   try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}
-  if(bc)bc.postMessage({type:'sync',data:JSON.stringify(S)});
+  if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
 }
-function hydrate(){
-  try{const r=localStorage.getItem(SK);if(r)S=JSON.parse(r);}catch(e){}
-}
-const bc=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('arm_tm4'):null;
-if(bc)bc.onmessage=e=>{
-  if(e.data.type!=='sync')return;
-  try{S=JSON.parse(e.data.data);}catch(x){}
-  isDisplay()?renderDisplay():renderAdminDynamic();
+function load(){try{const r=localStorage.getItem(SK);if(r)S=JSON.parse(r);}catch(e){}}
+
+const ch=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('atm5'):null;
+if(ch)ch.onmessage=e=>{
+  if(e.data.t!=='sync')return;
+  try{S=JSON.parse(e.data.d);}catch(x){}
+  isDsp()?renderDsp():renderAdm();
 };
-const isDisplay=()=>location.hash==='#display';
+
+const isDsp=()=>location.hash==='#display';
 
 window.addEventListener('DOMContentLoaded',()=>{
-  hydrate();
-  if(isDisplay()){
-    document.getElementById('admin-app').style.display='none';
-    document.getElementById('display-app').style.display='flex';
-    renderDisplay();startClock();initScanner();
+  load();
+  if(isDsp()){
+    document.getElementById('A').style.display='none';
+    document.getElementById('D').style.display='flex';
+    renderDsp();tick();initScan();
   } else {
-    buildCountrySelect();
-    renderAdminAll();
-    initScanner();
+    buildCountrySel();
+    renderAdm();
+    initScan();
   }
 });
 
-function openDisplayWindow(){
+function openDisplay(){
   window.open(location.href.split('#')[0]+'#display','_blank','width=1920,height=1080');
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // TABS
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 function showTab(t){
-  ['reg','cats','ctrl'].forEach(x=>document.getElementById('tab-'+x).style.display=x===t?'block':'none');
-  document.querySelectorAll('.adm-tab').forEach((el,i)=>el.classList.toggle('active',['reg','cats','ctrl'][i]===t));
-  if(t==='cats')renderCatsTab();
-  if(t==='ctrl')renderAdminDynamic();
+  ['reg','cats','ctrl'].forEach(x=>$('t-'+x).style.display=x===t?'block':'none');
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('on',['reg','cats','ctrl'][i]===t));
+  if(t==='cats')renderCats();
+  if(t==='ctrl')renderAdm();
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // COUNTRY SELECT
-// ═══════════════════════════════════════════
-function buildCountrySelect(){
-  const s=document.getElementById('p-co');
+// ════════════════════════════════════════════
+function buildCountrySel(){
+  const s=$('pco');
   s.innerHTML='<option value="">— No country —</option>';
-  COUNTRIES.forEach(x=>{s.innerHTML+=`<option value="${x.c}">${x.n}</option>`;});
+  CC.forEach(x=>{s.innerHTML+=`<option value="${x.c}">${x.n}</option>`;});
 }
 
-// ═══════════════════════════════════════════
-// CATEGORY CHECKBOXES
-// ═══════════════════════════════════════════
-function buildCatCheckboxes(existingEntries){
-  const el=document.getElementById('p-cats-list');
-  el.innerHTML='';
-  const allCats=[...S.categories.filter(c=>c.arm==='left'),...S.categories.filter(c=>c.arm==='right')];
-  allCats.forEach(cat=>{
-    const ex=existingEntries.find(e=>e.catId===cat.id);
-    const checked=!!ex;
-    const armVal=ex?ex.arm:'both';
+// ════════════════════════════════════════════
+// CATEGORY CHECKBOXES IN PLAYER MODAL
+// ════════════════════════════════════════════
+function buildCatCBs(ex){
+  const el=$('pcat');el.innerHTML='';
+  const all=[...S.cats.filter(c=>c.arm==='left'),...S.cats.filter(c=>c.arm==='right')];
+  all.forEach(cat=>{
+    const e=ex.find(x=>x.cid===cat.id);
+    const chk=!!e, av=e?e.arm:'both';
     const row=document.createElement('div');
-    row.className='cc-row';
+    row.className='ccr';
     row.innerHTML=`
-      <input type="checkbox" id="cc-${cat.id}" onchange="toggleCC(${cat.id})"
-        style="width:16px;height:16px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)" ${checked?'checked':''}>
-      <label for="cc-${cat.id}" class="cc-mlbl">
-        <span class="tag ${cat.arm==='left'?'tag-left':'tag-right'}" style="margin-right:6px">${cat.arm==='left'?'L':'R'}</span>${cat.name}
+      <input type="checkbox" id="cb${cat.id}" onchange="togCB(${cat.id})"
+        style="width:16px;height:16px;flex-shrink:0;cursor:pointer;accent-color:var(--accent)" ${chk?'checked':''}>
+      <label for="cb${cat.id}" class="ccl">
+        <span class="tag ${cat.arm==='left'?'tl':'tr'}" style="margin-right:6px">${cat.arm==='left'?'L':'R'}</span>${cat.name}
       </label>
-      <div id="cc-arm-${cat.id}" class="cc-arms ${checked?'show':''}">
+      <div id="ca${cat.id}" class="cca ${chk?'on':''}">
         ${['left','right','both'].map(a=>`
-          <label><input type="radio" name="arm-${cat.id}" value="${a}"
-            style="accent-color:var(--accent);width:13px;height:13px" ${armVal===a?'checked':''}>
+          <label><input type="radio" name="ra${cat.id}" value="${a}"
+            style="accent-color:var(--accent);width:13px;height:13px" ${av===a?'checked':''}>
             ${a==='both'?'Both':a==='left'?'Left':'Right'}</label>`).join('')}
       </div>`;
     el.appendChild(row);
   });
 }
 
-function toggleCC(catId){
-  const cb=document.getElementById('cc-'+catId);
-  document.getElementById('cc-arm-'+catId).classList.toggle('show',cb.checked);
+function togCB(id){
+  const cb=$('cb'+id);
+  $('ca'+id).classList.toggle('on',cb.checked);
 }
 
-function getSelectedEntries(){
+function getEntries(){
   const out=[];
-  S.categories.forEach(cat=>{
-    const cb=document.getElementById('cc-'+cat.id);
+  S.cats.forEach(cat=>{
+    const cb=$('cb'+cat.id);
     if(cb&&cb.checked){
       let arm='both';
-      document.querySelectorAll(`input[name="arm-${cat.id}"]`).forEach(r=>{if(r.checked)arm=r.value;});
-      out.push({catId:cat.id,arm});
+      document.querySelectorAll(`input[name="ra${cat.id}"]`).forEach(r=>{if(r.checked)arm=r.value;});
+      out.push({cid:cat.id,arm});
     }
   });
   return out;
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // PLAYER CRUD
-// ═══════════════════════════════════════════
-let editId=null,pendingPhoto=null,wcStream=null;
+// ════════════════════════════════════════════
+let eid=null,pph=null,wcs=null;
 
-function openAddPlayer(){
-  if(S.tournament.locked){alert('Registrations are locked.');return;}
-  editId=null;pendingPhoto=null;
-  document.getElementById('mp-title').textContent='Add Player';
-  document.getElementById('p-ln').value='';
-  document.getElementById('p-fn').value='';
-  document.getElementById('p-co').value='';
-  buildCatCheckboxes([]);
-  setPhotoPreview(null);
-  document.getElementById('modal-player').style.display='flex';
+function openAdd(){
+  if(S.T.locked){alert('Registrations are locked.');return;}
+  eid=null;pph=null;
+  $('mptitle').textContent='Add Player';
+  $('pln').value='';$('pfn').value='';$('pco').value='';
+  buildCatCBs([]);setPP(null);
+  $('m-player').style.display='flex';
 }
 
-function openEditPlayer(id){
-  if(S.tournament.locked){alert('Registrations are locked.');return;}
+function openEdit(id){
+  if(S.T.locked){alert('Registrations are locked.');return;}
   const p=S.players.find(x=>x.id===id);if(!p)return;
-  editId=id;pendingPhoto=p.photo||null;
-  document.getElementById('mp-title').textContent='Edit Player';
-  document.getElementById('p-ln').value=p.lastName;
-  document.getElementById('p-fn').value=p.firstName;
-  document.getElementById('p-co').value=p.country||'';
-  buildCatCheckboxes(p.entries||[]);
-  setPhotoPreview(p.photo||null);
-  document.getElementById('modal-player').style.display='flex';
+  eid=id;pph=p.photo||null;
+  $('mptitle').textContent='Edit Player';
+  $('pln').value=p.lastName;$('pfn').value=p.firstName;$('pco').value=p.country||'';
+  buildCatCBs(p.entries||[]);setPP(p.photo||null);
+  $('m-player').style.display='flex';
 }
 
-function setPhotoPreview(src){
-  const box=document.getElementById('p-photo-box'),cl=document.getElementById('p-clear-photo');
-  if(src){box.innerHTML=`<img src="${src}" style="width:100%;height:100%;object-fit:cover">`;cl.style.display='';}
-  else{box.innerHTML='👤';cl.style.display='none';}
+function setPP(src){
+  const b=$('pphbox'),c=$('pclr');
+  if(src){b.innerHTML=`<img src="${src}" style="width:100%;height:100%;object-fit:cover">`;c.style.display='';}
+  else{b.innerHTML='👤';c.style.display='none';}
 }
-function clearPhoto(){pendingPhoto=null;setPhotoPreview(null);}
+function clearPhoto(){pph=null;setPP(null);}
 
-function handleFile(e){
+function onFile(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
-  r.onload=ev=>{pendingPhoto=ev.target.result;setPhotoPreview(pendingPhoto);};
+  r.onload=ev=>{pph=ev.target.result;setPP(pph);};
   r.readAsDataURL(f);e.target.value='';
 }
 
-function openWebcam(){
+function openCam(){
   navigator.mediaDevices.getUserMedia({video:true}).then(s=>{
-    wcStream=s;document.getElementById('webcam-video').srcObject=s;
-    document.getElementById('modal-webcam').style.display='flex';
+    wcs=s;$('wcv').srcObject=s;$('m-cam').style.display='flex';
   }).catch(()=>alert('Cannot access webcam.'));
 }
-function closeWebcam(){
-  if(wcStream){wcStream.getTracks().forEach(t=>t.stop());wcStream=null;}
-  document.getElementById('modal-webcam').style.display='none';
-}
-function captureWebcam(){
-  const v=document.getElementById('webcam-video'),c=document.getElementById('webcam-canvas');
+function closeCam(){if(wcs){wcs.getTracks().forEach(t=>t.stop());wcs=null;}closeM('m-cam');}
+function captureCam(){
+  const v=$('wcv'),c=$('wcc');
   c.width=v.videoWidth;c.height=v.videoHeight;
   c.getContext('2d').drawImage(v,0,0);
-  pendingPhoto=c.toDataURL('image/jpeg',.85);
-  setPhotoPreview(pendingPhoto);closeWebcam();
+  pph=c.toDataURL('image/jpeg',.85);setPP(pph);closeCam();
 }
 
 function savePlayer(){
-  const ln=document.getElementById('p-ln').value.trim().toUpperCase();
-  const fn=document.getElementById('p-fn').value.trim();
-  const co=document.getElementById('p-co').value;
-  const entries=getSelectedEntries();
+  const ln=$('pln').value.trim().toUpperCase();
+  const fn=$('pfn').value.trim();
+  const co=$('pco').value;
+  const entries=getEntries();
   if(!ln||!fn){alert('Please fill Last Name and First Name.');return;}
   if(!entries.length){alert('Please select at least one category.');return;}
-  if(editId!==null){
-    const p=S.players.find(x=>x.id===editId);
+  if(eid!==null){
+    const p=S.players.find(x=>x.id===eid);
     Object.assign(p,{lastName:ln,firstName:fn,country:co,entries});
-    if(pendingPhoto!==null)p.photo=pendingPhoto;
+    if(pph!==null)p.photo=pph;
   } else {
-    S.players.push({id:S.nextPid++,barcode:String(S.nextBarcode++),lastName:ln,firstName:fn,country:co,photo:pendingPhoto||null,entries});
+    S.players.push({id:S.pid++,bc:String(S.bid++),lastName:ln,firstName:fn,country:co,photo:pph||null,entries});
   }
-  persist();closeModal('modal-player');renderAdminAll();
+  save();closeM('m-player');renderAdm();
 }
 
-function deletePlayer(id){
-  if(S.tournament.locked){alert('Registrations are locked.');return;}
-  confirm2('Delete player?','This player will be permanently removed.',()=>{
-    S.players=S.players.filter(x=>x.id!==id);persist();renderAdminAll();
+function delPlayer(id){
+  if(S.T.locked){alert('Registrations are locked.');return;}
+  ask('Delete player?','This player will be permanently removed.',()=>{
+    S.players=S.players.filter(x=>x.id!==id);save();renderAdm();
   });
 }
 
-function renderPlayersTable(){
-  const tbody=document.getElementById('ptbody');
-  document.getElementById('plbl').textContent=S.players.length+' player'+(S.players.length!==1?'s':'');
+function renderTable(){
+  const tb=$('ptb');
+  $('plbl').textContent=S.players.length+' player'+(S.players.length!==1?'s':'');
   if(!S.players.length){
-    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:28px">No players yet. Click "+ Add Player".</td></tr>';return;
+    tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No players yet. Click "+ Add Player".</td></tr>';return;
   }
-  tbody.innerHTML=S.players.map(p=>{
-    const ph=p.photo?`<img class="thumb" src="${p.photo}">`:`<div class="thumb-ph">👤</div>`;
-    const fl=p.country?`<img class="flag-img" src="${flagUrl(p.country)}" onerror="this.style.display='none'"> `:'';
-    const ctry=COUNTRIES.find(x=>x.c===p.country);
-    const catTags=(p.entries||[]).map(e=>{
-      const cat=S.categories.find(c=>c.id===e.catId)||{name:'?',arm:'left'};
+  tb.innerHTML=S.players.map(p=>{
+    const ph=p.photo?`<img class="th" src="${p.photo}">`:`<div class="thp">👤</div>`;
+    const fl=p.country?`<img class="fi" src="${furl(p.country)}" onerror="this.style.display='none'"> `:'';
+    const cn=CC.find(x=>x.c===p.country);
+    const ctags=(p.entries||[]).map(e=>{
+      const cat=S.cats.find(c=>c.id===e.cid)||{name:'?',arm:'left'};
       const al=e.arm==='both'?'L+R':e.arm==='left'?'L':'R';
-      return `<span class="tag tag-${cat.arm}" style="margin:1px 2px 1px 0">${cat.name} [${al}]</span>`;
+      return `<span class="tag ${cat.arm==='left'?'tl':'tr'}" style="margin:1px 2px 1px 0">${cat.name} [${al}]</span>`;
     }).join('')||'—';
     return `<tr>
-      <td><span class="bc">${p.barcode}</span></td>
+      <td><span class="bc">${p.bc}</span></td>
       <td>${ph}</td>
       <td style="font-weight:600">${p.lastName}</td>
       <td>${p.firstName}</td>
-      <td style="max-width:280px;white-space:normal">${catTags}</td>
-      <td>${fl}${ctry?ctry.n:'—'}</td>
+      <td style="max-width:280px;white-space:normal">${ctags}</td>
+      <td>${fl}${cn?cn.n:'—'}</td>
       <td style="white-space:nowrap">
-        <button class="btn btn-secondary btn-sm" onclick="openEditPlayer(${p.id})" ${S.tournament.locked?'disabled':''}>✏</button>
-        <button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="deletePlayer(${p.id})" ${S.tournament.locked?'disabled':''}>✕</button>
+        <button class="btn btn-n sm" onclick="openEdit(${p.id})" ${S.T.locked?'disabled':''}>✏</button>
+        <button class="btn btn-r sm" style="margin-left:4px" onclick="delPlayer(${p.id})" ${S.T.locked?'disabled':''}>✕</button>
       </td>
     </tr>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // CATEGORIES TAB
-// ═══════════════════════════════════════════
-function renderCatsTab(){
-  ['cats-left','cats-right'].forEach(id=>document.getElementById(id).innerHTML='');
-  ['btn-add-left','btn-add-right'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=!!S.tournament.locked;});
-  S.categories.forEach((c,i)=>{
-    const inUse=S.players.some(p=>(p.entries||[]).some(e=>e.catId===c.id));
-    const ns=c.arm==='left'?'background:#1a3a5c;color:var(--accent2)':'background:#3a1a1a;color:#ff8888';
-    const div=document.createElement('div');
-    div.className='cat-row';
-    div.innerHTML=`<div class="cat-num" style="${ns}">${i+1}</div>
-      <input value="${c.name}" ${S.tournament.locked?'disabled':''} onchange="updateCat(${c.id},this.value)" style="flex:1">
-      <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})"
-        ${inUse||S.tournament.locked?'disabled':''} title="${inUse?'Has registered players':'Delete'}">✕</button>`;
-    document.getElementById('cats-'+c.arm).appendChild(div);
+// ════════════════════════════════════════════
+function renderCats(){
+  $('cl').innerHTML='';$('cr').innerHTML='';
+  ['addL','addR'].forEach(id=>{const b=$(id);if(b)b.disabled=!!S.T.locked;});
+  const left=S.cats.filter(c=>c.arm==='left');
+  const right=S.cats.filter(c=>c.arm==='right');
+  [left,right].forEach((list,side)=>{
+    list.forEach((c,i)=>{
+      const inUse=S.players.some(p=>(p.entries||[]).some(e=>e.cid===c.id));
+      const ns=c.arm==='left'?'background:#1a3a5c;color:var(--a2)':'background:#3a1a1a;color:#ff8888';
+      const div=document.createElement('div');
+      div.className='crow';
+      div.innerHTML=`<div class="cnum" style="${ns}">${i+1}</div>
+        <input value="${c.name}" ${S.T.locked?'disabled':''} onchange="updCat(${c.id},this.value)" style="flex:1">
+        <button class="btn btn-r sm" onclick="delCat(${c.id})"
+          ${inUse||S.T.locked?'disabled':''} title="${inUse?'Has players':'Delete'}">✕</button>`;
+      $(c.arm==='left'?'cl':'cr').appendChild(div);
+    });
   });
 }
 
-function updateCat(id,val){const c=S.categories.find(x=>x.id===id);if(c){c.name=val;persist();}}
+function updCat(id,v){const c=S.cats.find(x=>x.id===id);if(c){c.name=v;save();}}
 
-function addCategory(arm){
-  if(S.tournament.locked){alert('Cannot modify categories while tournament is running.');return;}
-  S.categories.push({id:S.nextCatId++,arm,name:'New Category'});
-  persist();renderCatsTab();
+function addCat(arm){
+  if(S.T.locked){alert('Cannot modify categories while tournament is running.');return;}
+  S.cats.push({id:S.cid++,arm,name:'New Category'});
+  save();renderCats();
 }
 
-function deleteCategory(id){
-  if(S.tournament.locked){alert('Cannot modify categories while tournament is running.');return;}
-  if(S.players.some(p=>(p.entries||[]).some(e=>e.catId===id))){alert('This category has registered players. Remove them first.');return;}
-  confirm2('Delete category?','This cannot be undone.',()=>{
-    S.categories=S.categories.filter(c=>c.id!==id);persist();renderCatsTab();
+function delCat(id){
+  if(S.T.locked){alert('Cannot modify categories while tournament is running.');return;}
+  if(S.players.some(p=>(p.entries||[]).some(e=>e.cid===id))){alert('This category has registered players. Remove them first.');return;}
+  ask('Delete category?','This cannot be undone.',()=>{
+    S.cats=S.cats.filter(c=>c.id!==id);save();renderCats();
   });
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // SWISS SYSTEM ENGINE
-// ═══════════════════════════════════════════
-const csKey=(catId,arm)=>catId+'_'+arm;
+// ════════════════════════════════════════════
+const csk=(cid,arm)=>cid+'_'+arm;
 
-function initCatState(catId,arm){
-  // arm is always 'left' or 'right' here — 'both' from entries counts for either
+function initCS(cid,arm){
   const players=S.players
-    .filter(p=>(p.entries||[]).some(e=>e.catId===catId&&(e.arm===arm||e.arm==='both')))
-    .map(p=>({id:p.id,wins:0,losses:0}));
+    .filter(p=>(p.entries||[]).some(e=>e.cid===cid&&(e.arm===arm||e.arm==='both')))
+    .map(p=>({id:p.id,w:0,l:0}));
   shuffle(players);
-  return{catId,arm,players,winnerQ:players.map(p=>p.id),loserQ:[],eliminated:[],currentMatch:null,matchHistory:[],done:false};
+  return{cid,arm,players,wq:[...players.map(p=>p.id)],lq:[],elim:[],cur:null,hist:[],done:false};
 }
 
-function nxtMatch(cs){
-  if(cs.winnerQ.length>=2)return{p1:cs.winnerQ.shift(),p2:cs.winnerQ.shift()};
-  if(cs.loserQ.length>=2) return{p1:cs.loserQ.shift(), p2:cs.loserQ.shift()};
-  if(cs.winnerQ.length===1&&cs.loserQ.length>=1)return{p1:cs.winnerQ.shift(),p2:cs.loserQ.shift()};
-  if(cs.loserQ.length===1&&cs.winnerQ.length>=1)return{p1:cs.loserQ.shift(), p2:cs.winnerQ.shift()};
+function nxtM(cs){
+  if(cs.wq.length>=2)return{p1:cs.wq.shift(),p2:cs.wq.shift()};
+  if(cs.lq.length>=2)return{p1:cs.lq.shift(),p2:cs.lq.shift()};
+  if(cs.wq.length===1&&cs.lq.length>=1)return{p1:cs.wq.shift(),p2:cs.lq.shift()};
+  if(cs.lq.length===1&&cs.wq.length>=1)return{p1:cs.lq.shift(),p2:cs.wq.shift()};
   return null;
 }
 
-function activePl(cs){return cs.players.filter(p=>p.losses<2);}
+function active(cs){return cs.players.filter(p=>p.l<2);}
 
-function declareWinner(winnerId){
-  let secIdx=-1,cs=null;
+function doWin(wid){
+  // Find which section this player is currently fighting in
+  let si=-1,cs=null;
   for(let i=0;i<3;i++){
-    const sec=S.tournament.sections[i];if(!sec||sec.done)continue;
-    const c=S.catStates[sec.key];if(!c||!c.currentMatch)continue;
-    if(c.currentMatch.p1===winnerId||c.currentMatch.p2===winnerId){secIdx=i;cs=c;break;}
+    const sec=S.T.secs[i];if(!sec||sec.done)continue;
+    const c=S.CS[sec.key];if(!c||!c.cur)continue;
+    if(c.cur.p1===wid||c.cur.p2===wid){si=i;cs=c;break;}
   }
-  if(secIdx===-1)return -1;
+  if(si===-1)return -1;
 
-  const m=cs.currentMatch,loserId=m.p1===winnerId?m.p2:m.p1;
-  cs.matchHistory.push({p1:m.p1,p2:m.p2,winner:winnerId});
-  const wp=cs.players.find(x=>x.id===winnerId),lp=cs.players.find(x=>x.id===loserId);
-  if(wp)wp.wins++;if(lp)lp.losses++;
-  cs.winnerQ.push(winnerId);
-  if(lp&&lp.losses>=2)cs.eliminated.push(loserId);
-  else if(lp)cs.loserQ.push(loserId);
+  const lid=cs.cur.p1===wid?cs.cur.p2:cs.cur.p1;
+  const ts=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const cat=S.cats.find(c=>c.id===cs.cid)||{name:'?'};
+  const wp=S.players.find(x=>x.id===wid),lp_=S.players.find(x=>x.id===lid);
+  const wname=wp?wp.lastName:'?', lname=lp_?lp_.lastName:'?';
 
-  const active=activePl(cs);
-  if(active.length===1){
-    cs.eliminated.push(active[0].id);
-    cs.currentMatch=null;cs.done=true;
-    S.tournament.sections[secIdx].done=true;
-    S.tournament.catsDone.push(csKey(cs.catId,cs.arm));
-    if(!isDisplay())showCatWinner(active[0].id,cs.catId);
-    setTimeout(()=>{advanceSection(secIdx);persist();renderAdminDynamic();if(isDisplay())renderDisplay();if(bc)bc.postMessage({type:'sync',data:JSON.stringify(S)});},3500);
+  cs.hist.push({p1:cs.cur.p1,p2:cs.cur.p2,w:wid});
+  addLog(`[${ts}] Sec ${si+1} · ${cat.name} [${cs.arm.toUpperCase()}] — ${wname} beat ${lname}`);
+
+  const wpp=cs.players.find(x=>x.id===wid),lpp=cs.players.find(x=>x.id===lid);
+  if(wpp)wpp.w++;if(lpp)lpp.l++;
+  cs.wq.push(wid);
+  if(lpp&&lpp.l>=2)cs.elim.push(lid);
+  else if(lpp)cs.lq.push(lid);
+
+  const act=active(cs);
+  if(act.length===1){
+    cs.elim.push(act[0].id);
+    cs.cur=null;cs.done=true;
+    S.T.secs[si].done=true;
+    S.T.done.push(csk(cs.cid,cs.arm));
+    const cn=CC.find(x=>x.c===wp?.country);
+    addLog(`[${ts}] 🏆 ${cat.name} [${cs.arm.toUpperCase()}] WINNER: ${wname}`);
+    if(!isDsp())showWinner(act[0].id,cs.cid);
+    setTimeout(()=>{advSec(si);save();renderAdm();if(isDsp())renderDsp();if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});},3500);
   } else {
-    cs.currentMatch=nxtMatch(cs);
+    cs.cur=nxtM(cs);
   }
-  return secIdx;
+  return si;
 }
 
-function showCatWinner(pid,catId){
+function addLog(txt){
+  if(!S.log)S.log=[];
+  S.log.unshift({ts:Date.now(),txt});
+  if(S.log.length>100)S.log.pop();
+}
+
+function showWinner(pid,cid){
   const p=S.players.find(x=>x.id===pid);
-  const cat=S.categories.find(c=>c.id===catId)||{name:'?'};
+  const cat=S.cats.find(c=>c.id===cid)||{name:'?'};
   if(!p)return;
-  document.getElementById('mw-name').textContent=p.lastName+' '+p.firstName;
-  document.getElementById('mw-cat').textContent='Category: '+cat.name;
-  document.getElementById('modal-winner').style.display='flex';
+  $('wname').textContent=p.lastName+' '+p.firstName;
+  $('wcat').textContent='Category: '+cat.name;
+  $('m-winner').style.display='flex';
 }
 
-function advanceSection(secIdx){
-  if(!S.tournament.catQueue.length){
-    if(S.tournament.sections.every(s=>!s||s.done)){
-      if(S.tournament.currentArm==='right')S.tournament.phase='done';
+function advSec(si){
+  const q=S.T.queue;
+  if(!q.length){
+    if(S.T.secs.every(s=>!s||s.done)){
+      if(S.T.curArm==='right'){S.T.phase='done';addLog('🎉 Tournament complete!');}
     }
-    S.tournament.sections[secIdx]=null;
-    return;
+    S.T.secs[si]=null;return;
   }
-  const next=S.tournament.catQueue.shift();
-  const key=csKey(next.catId,next.arm);
-  S.catStates[key]=initCatState(next.catId,next.arm);
-  const cs=S.catStates[key];
+  const nx=q.shift();
+  const key=csk(nx.cid,nx.arm);
+  S.CS[key]=initCS(nx.cid,nx.arm);
+  const cs=S.CS[key];
+  const cat=S.cats.find(c=>c.id===nx.cid)||{name:'?'};
+  addLog(`Section ${si+1}: starting ${cat.name} [${nx.arm.toUpperCase()}] — ${cs.players.length} players`);
   if(cs.players.length<2){
-    cs.done=true;S.tournament.sections[secIdx]={catId:next.catId,arm:next.arm,key,done:true};
-    advanceSection(secIdx);return;
+    cs.done=true;S.T.secs[si]={cid:nx.cid,arm:nx.arm,key,done:true};
+    advSec(si);return;
   }
-  cs.currentMatch=nxtMatch(cs);
-  S.tournament.sections[secIdx]={catId:next.catId,arm:next.arm,key,done:false};
+  cs.cur=nxtM(cs);
+  S.T.secs[si]={cid:nx.cid,arm:nx.arm,key,done:false};
 }
 
-function buildCatList(armSide){
-  return S.categories
-    .filter(c=>c.arm===armSide)
-    .filter(cat=>S.players.some(p=>(p.entries||[]).some(e=>e.catId===cat.id&&(e.arm===armSide||e.arm==='both'))))
-    .map(cat=>({catId:cat.id,arm:armSide}));
+function catList(arm){
+  return S.cats
+    .filter(c=>c.arm===arm)
+    .filter(c=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===c.id&&(e.arm===arm||e.arm==='both'))))
+    .map(c=>({cid:c.id,arm}));
 }
 
-function fillSection(secIdx,item){
-  const key=csKey(item.catId,item.arm);
-  S.catStates[key]=initCatState(item.catId,item.arm);
-  const cs=S.catStates[key];
+function fillSec(si,item){
+  const key=csk(item.cid,item.arm);
+  S.CS[key]=initCS(item.cid,item.arm);
+  const cs=S.CS[key];
+  const cat=S.cats.find(c=>c.id===item.cid)||{name:'?'};
+  addLog(`Section ${si+1}: starting ${cat.name} [${item.arm.toUpperCase()}] — ${cs.players.length} players`);
   if(cs.players.length<2){
-    cs.done=true;S.tournament.sections[secIdx]={catId:item.catId,arm:item.arm,key,done:true};
+    cs.done=true;S.T.secs[si]={cid:item.cid,arm:item.arm,key,done:true};
   } else {
-    cs.currentMatch=nxtMatch(cs);S.tournament.sections[secIdx]={catId:item.catId,arm:item.arm,key,done:false};
+    cs.cur=nxtM(cs);
+    S.T.secs[si]={cid:item.cid,arm:item.arm,key,done:false};
   }
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // TOURNAMENT CONTROL
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 function startTournament(){
   if(!S.players.length){alert('No players registered.');return;}
-  confirm2('Start Tournament?','Registrations will be locked. This cannot be undone.',()=>{
-    S.tournament.phase='running';
-    S.tournament.locked=true;
-    S.tournament.currentArm='left';
-    S.tournament.catsDone=[];
-    S.catStates={};
-    const leftList=buildCatList('left');
-    S._rightList=buildCatList('right');
+  ask('Start Tournament?','Registrations will be locked. This cannot be undone.',()=>{
+    S.T.phase='running';S.T.locked=true;S.T.curArm='left';
+    S.T.done=[];S.CS={};S.log=[];
+    const ll=catList('left');
+    S._rlist=catList('right');
     for(let i=0;i<3;i++){
-      if(leftList[i])fillSection(i,leftList[i]);
-      else S.tournament.sections[i]=null;
+      if(ll[i])fillSec(i,ll[i]);else S.T.secs[i]=null;
     }
-    S.tournament.catQueue=leftList.slice(3);
-    persist();renderAdminAll();
+    S.T.queue=ll.slice(3);
+    addLog('Tournament started — Left Arm');
+    save();renderAdm();
   });
 }
 
-function switchToRightArm(){
-  confirm2('Switch to Right Arm?','Left arm is complete. Right arm will now begin.',()=>{
-    S.tournament.currentArm='right';
-    S.catStates={};
-    const rightList=S._rightList||buildCatList('right');
+function switchArm(){
+  ask('Switch to Right Arm?','Left arm is complete. Right arm will now begin.',()=>{
+    S.T.curArm='right';S.CS={};
+    const rl=S._rlist||catList('right');
     for(let i=0;i<3;i++){
-      if(rightList[i])fillSection(i,rightList[i]);
-      else S.tournament.sections[i]=null;
+      if(rl[i])fillSec(i,rl[i]);else S.T.secs[i]=null;
     }
-    S.tournament.catQueue=rightList.slice(3);
-    persist();renderAdminAll();
+    S.T.queue=rl.slice(3);
+    addLog('Switched to Right Arm');
+    save();renderAdm();
   });
 }
 
 function resetTournament(){
-  confirm2('Full Reset?','All match data will be erased. Registrations stay intact.',()=>{
-    S.tournament={phase:'setup',currentArm:'left',locked:false,catQueue:[],sections:[null,null,null],catsDone:[]};
-    S.catStates={};S._rightList=null;
-    persist();renderAdminAll();
+  ask('Full Reset?','All match data will be erased. Registrations stay intact.',()=>{
+    S.T={phase:'setup',curArm:'left',locked:false,queue:[],secs:[null,null,null],done:[]};
+    S.CS={};S._rlist=null;S.log=[];
+    save();renderAdm();
   });
 }
 
-// ═══════════════════════════════════════════
+// Manual win button from ctrl tab
+function manualWin(pid){
+  const p=S.players.find(x=>x.id===pid);if(!p)return;
+  const si=doWin(pid);
+  if(si>=0){save();renderAdm();if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});}
+  else alert('Player is not in an active match right now.');
+}
+
+// ════════════════════════════════════════════
 // ADMIN RENDER
-// ═══════════════════════════════════════════
-function renderAdminAll(){renderPlayersTable();renderAdminDynamic();}
+// ════════════════════════════════════════════
+function renderAdm(){renderTable();renderCtrl();}
 
-function renderAdminDynamic(){
-  const t=S.tournament;
+function renderCtrl(){
+  const T=S.T;
   const phases={setup:'SETUP',running:'IN PROGRESS',done:'FINISHED'};
-  setEl('phase-badge',phases[t.phase]||'SETUP');
+  tx('pbadge',phases[T.phase]||'SETUP');
 
-  const ab=document.getElementById('arm-ctrl');
-  if(ab){ab.style.display=t.phase==='running'?'':'none';ab.textContent=t.currentArm.toUpperCase()+' ARM';ab.className='tag '+(t.currentArm==='left'?'tag-left':'tag-right');}
+  const ab=$('abadge');
+  if(ab){
+    ab.style.display=T.phase==='running'?'':'none';
+    ab.textContent=T.curArm.toUpperCase()+' ARM';
+    ab.className='tag '+(T.curArm==='left'?'tl':'tr');
+  }
 
-  const showStart=t.phase==='setup'&&S.players.length>0;
-  const showReset=t.phase!=='setup';
-  const leftDone=t.phase==='running'&&t.currentArm==='left'&&!t.catQueue.length&&t.sections.every(s=>!s||s.done);
-  setDisp('btn-start-hdr',showStart);setDisp('btn-reset-hdr',showReset);
-  setDisp('btn-start',t.phase==='setup');setDisp('btn-reset',showReset);setDisp('btn-rightarm',leftDone);
+  const showStart=T.phase==='setup'&&S.players.length>0;
+  const leftDone=T.phase==='running'&&T.curArm==='left'&&!T.queue.length&&T.secs.every(s=>!s||s.done);
+  sd('hdr-start',showStart);sd('hdr-reset',T.phase!=='setup');
+  sd('btn-start',T.phase==='setup');
+  sd('btn-switch',leftDone);
+  sd('btn-reset',T.phase!=='setup');
 
-  let totalM=0;Object.values(S.catStates).forEach(cs=>totalM+=cs.matchHistory.length);
-  setEl('st-players',S.players.length);setEl('st-matches',totalM);
-  setEl('st-done',(t.catsDone||[]).length);setEl('st-active',t.sections.filter(s=>s&&!s.done).length);
+  let tm=0;Object.values(S.CS).forEach(cs=>tm+=cs.hist.length);
+  tx('stp',S.players.length);tx('stm',tm);
+  tx('std',(T.done||[]).length);
+  tx('sta',T.secs.filter(s=>s&&!s.done).length);
 
+  // Section cards
+  const s3=$('s3');s3.innerHTML='';
   for(let i=0;i<3;i++){
-    const bodyEl=document.getElementById('ctrl-s'+i);if(!bodyEl)continue;
-    const sec=t.sections[i];
-    if(!sec){bodyEl.innerHTML='<span style="color:var(--text2);font-size:12px">Waiting for assignment</span>';continue;}
-    const cat=S.categories.find(c=>c.id===sec.catId)||{name:'?'};
-    const cs=S.catStates[sec.key];
-    if(!cs){bodyEl.innerHTML='<span style="color:var(--text2)">Loading...</span>';continue;}
-    let h=`<div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">${cat.name} [${sec.arm.toUpperCase()}]</div>`;
-    if(sec.done){
-      const wid=cs.eliminated[cs.eliminated.length-1];
-      const wp=wid!==undefined?S.players.find(x=>x.id===wid):null;
-      h+=`<div style="color:var(--green);font-weight:700">✓ Complete</div>`;
-      if(wp)h+=`<div style="font-size:12px;color:var(--accent);margin-top:3px">🏆 ${wp.lastName} ${wp.firstName}</div>`;
-    } else if(cs.currentMatch){
-      const p1=S.players.find(x=>x.id===cs.currentMatch.p1),p2=S.players.find(x=>x.id===cs.currentMatch.p2);
-      const sp1=cs.players.find(x=>x.id===cs.currentMatch.p1),sp2=cs.players.find(x=>x.id===cs.currentMatch.p2);
-      h+=`<div style="font-size:13px;margin-bottom:4px">
-        <span class="bc">${p1?p1.barcode:'?'}</span> <b>${p1?p1.lastName:'?'}</b>
-        <span style="color:var(--text2)">(${sp1?sp1.losses:0}L)</span>
-        <span style="color:var(--text2);margin:0 4px">vs</span>
-        <span class="bc">${p2?p2.barcode:'?'}</span> <b>${p2?p2.lastName:'?'}</b>
-        <span style="color:var(--text2)">(${sp2?sp2.losses:0}L)</span>
-      </div>`;
-      h+=`<div style="font-size:11px;color:var(--text2)">${activePl(cs).length} active · ${cs.matchHistory.length} played · ${cs.players.length} total</div>`;
-    } else {h+='<span style="color:var(--text2);font-size:12px">No active match</span>';}
-    bodyEl.innerHTML=h;
+    const sec=T.secs[i];
+    const card=document.createElement('div');
+    card.className='sc';
+    let h=`<h4>Section ${i+1}</h4>`;
+    if(!sec){h+='<span style="color:var(--muted);font-size:12px">Waiting for assignment</span>';}
+    else{
+      const cat=S.cats.find(c=>c.id===sec.cid)||{name:'?'};
+      const cs=S.CS[sec.key];
+      h+=`<div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">${cat.name} [${sec.arm.toUpperCase()}]</div>`;
+      if(sec.done){
+        const wid=cs?cs.elim[cs.elim.length-1]:null;
+        const wp=wid!=null?S.players.find(x=>x.id===wid):null;
+        h+=`<div style="color:var(--green);font-weight:700;margin-bottom:4px">✓ Complete</div>`;
+        if(wp)h+=`<div style="font-size:12px;color:var(--accent)">🏆 ${wp.lastName} ${wp.firstName}</div>`;
+      } else if(cs&&cs.cur){
+        const p1=S.players.find(x=>x.id===cs.cur.p1),p2=S.players.find(x=>x.id===cs.cur.p2);
+        const sp1=cs.players.find(x=>x.id===cs.cur.p1),sp2=cs.players.find(x=>x.id===cs.cur.p2);
+        h+=`<div style="font-size:13px;margin-bottom:8px">
+          <span class="bc">${p1?p1.bc:'?'}</span> <b>${p1?p1.lastName:'?'}</b>
+          <span style="color:var(--muted)"> (${sp1?sp1.l:0}L)</span>
+          <span style="color:var(--muted);margin:0 4px">vs</span>
+          <span class="bc">${p2?p2.bc:'?'}</span> <b>${p2?p2.lastName:'?'}</b>
+          <span style="color:var(--muted)"> (${sp2?sp2.l:0}L)</span>
+        </div>`;
+        h+=`<div style="display:flex;gap:6px;margin-bottom:8px">
+          <button class="btn btn-g sm" style="flex:1;justify-content:center" onclick="manualWin(${cs.cur.p1})">🏆 ${p1?p1.lastName:'?'}</button>
+          <button class="btn btn-g sm" style="flex:1;justify-content:center" onclick="manualWin(${cs.cur.p2})">🏆 ${p2?p2.lastName:'?'}</button>
+        </div>`;
+        h+=`<div style="font-size:11px;color:var(--muted)">${active(cs).length} active · ${cs.hist.length} played · ${cs.players.length} total</div>`;
+      } else {h+='<span style="color:var(--muted);font-size:12px">No active match</span>';}
+    }
+    card.innerHTML=h;s3.appendChild(card);
+  }
+
+  // Match log
+  const lb=$('logbox');
+  if(lb){
+    if(!S.log||!S.log.length){lb.innerHTML='<p style="color:var(--muted)">No matches yet.</p>';}
+    else{lb.innerHTML=S.log.map(e=>`<p>${e.txt}</p>`).join('');}
   }
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // DISPLAY RENDER
-// ═══════════════════════════════════════════
-function renderDisplay(){
-  const arm=S.tournament.currentArm;
-  const darm=document.getElementById('darm');
-  darm.textContent=arm.toUpperCase()+' ARM';
-  darm.className='arm-badge '+(arm==='left'?'arm-l':'arm-r');
-  for(let i=0;i<3;i++)renderDsSection(i);
+// ════════════════════════════════════════════
+function renderDsp(){
+  const arm=S.T.curArm;
+  const da=$('darm');
+  da.textContent=arm.toUpperCase()+' ARM';
+  da.className='arm-b '+(arm==='left'?'abl':'abr');
+
+  // Tournament done overlay
+  const over=$('td-over');
+  if(over)over.style.display=S.T.phase==='done'?'flex':'none';
+
+  for(let i=0;i<3;i++)renderSec(i);
 }
 
-function renderDsSection(idx){
-  const el=document.getElementById('ds'+idx);
-  const sec=S.tournament.sections[idx];
-  if(!sec||S.tournament.phase==='setup'){el.innerHTML=`<div class="dswait">Waiting...</div>`;return;}
-  const cat=S.categories.find(c=>c.id===sec.catId)||{name:'?'};
-  const cs=S.catStates[sec.key];
+function renderSec(i){
+  const el=$('ds'+i);
+  const sec=S.T.secs[i];
+  if(!sec||S.T.phase==='setup'){el.innerHTML=`<div class="wait">Waiting...</div>`;return;}
+  const cat=S.cats.find(c=>c.id===sec.cid)||{name:'?'};
+  const cs=S.CS[sec.key];
   let h=`<div class="dsh">
-    <div class="dsh-name">${cat.name}</div>
-    <div class="dsh-sub">${sec.arm.toUpperCase()} ARM · ${cs?cs.players.length:0} players</div>
+    <div class="dshn">${cat.name}</div>
+    <div class="dshs">${sec.arm.toUpperCase()} ARM · ${cs?cs.players.length:0} players</div>
   </div>`;
   if(!cs||sec.done||cs.done){
-    const wid=cs?cs.eliminated[cs.eliminated.length-1]:null;
-    const wp=wid!==undefined?S.players.find(x=>x.id===wid):null;
-    h+=`<div class="dsdone"><div class="dsdone-icon">🏆</div><div class="dsdone-txt">Category Complete</div>`;
-    if(wp)h+=`<div class="dsdone-winner">Winner: ${wp.lastName} ${wp.firstName}</div>`;
+    const wid=cs?cs.elim[cs.elim.length-1]:null;
+    const wp=wid!=null?S.players.find(x=>x.id===wid):null;
+    h+=`<div class="done"><div class="done-ic">🏆</div><div class="done-tx">Category Complete</div>`;
+    if(wp)h+=`<div class="done-wn">Winner: ${wp.lastName} ${wp.firstName}</div>`;
     h+='</div>';
-    if(cs)h+=dsRanking(cs);
+    if(cs)h+=rnkHtml(cs);
     el.innerHTML=h;return;
   }
-  if(!cs.currentMatch){h+=`<div class="dswait">No active match</div>`;el.innerHTML=h;return;}
-  const m=cs.currentMatch;
-  const p1=S.players.find(x=>x.id===m.p1),p2=S.players.find(x=>x.id===m.p2);
-  const sp1=cs.players.find(x=>x.id===m.p1)||{losses:0},sp2=cs.players.find(x=>x.id===m.p2)||{losses:0};
-  h+=`<div class="dsmatch">${dsPlayer(p1,sp1)}<div class="dsvs">VS</div>${dsPlayer(p2,sp2)}</div>`;
-  const upcoming=dsUpcoming(cs);
-  if(upcoming.length){
-    h+=`<div class="dsup"><div class="dsup-title">Next matches</div>`;
-    upcoming.slice(0,3).forEach(([a,b])=>{
+  if(!cs.cur){h+=`<div class="wait">No active match</div>`;el.innerHTML=h;return;}
+  const p1=S.players.find(x=>x.id===cs.cur.p1),p2=S.players.find(x=>x.id===cs.cur.p2);
+  const sp1=cs.players.find(x=>x.id===cs.cur.p1)||{l:0},sp2=cs.players.find(x=>x.id===cs.cur.p2)||{l:0};
+  h+=`<div class="dsm">${plHtml(p1,sp1)}<div class="dsvs">VS</div>${plHtml(p2,sp2)}</div>`;
+  const up=upcomingM(cs);
+  if(up.length){
+    h+=`<div class="dup"><div class="dupt">Next matches</div>`;
+    up.slice(0,3).forEach(([a,b])=>{
       const pa=S.players.find(x=>x.id===a),pb=S.players.find(x=>x.id===b);
-      h+=`<div class="dsup-item">${pa?pa.lastName:'?'} vs ${pb?pb.lastName:'?'}</div>`;
+      h+=`<div class="dupi">${pa?pa.lastName:'?'} vs ${pb?pb.lastName:'?'}</div>`;
     });
     h+='</div>';
   }
-  h+=dsRanking(cs);
+  h+=rnkHtml(cs);
   el.innerHTML=h;
 }
 
-function dsPlayer(p,stats){
-  if(!p)return'<div class="dsplayer"></div>';
-  const l=stats?stats.losses:0;
-  const photo=p.photo?`<img class="dsphoto" src="${p.photo}">`:`<div class="dsphoto-ph">👤</div>`;
-  const flag=p.country?`<img class="dsflag" src="${flagUrl(p.country)}" onerror="this.style.display='none'">`:'';
-  const dots=[0,1].map(i=>`<div class="dsloss ${i<l?'hit':''}"></div>`).join('');
-  return`<div class="dsplayer">${photo}${flag}
-    <div class="dsname">${p.lastName}<span>${p.firstName}</span></div>
-    <div class="dslosses">${dots}</div></div>`;
+function plHtml(p,st){
+  if(!p)return'<div class="dsp"></div>';
+  const l=st?st.l:0;
+  const ph=p.photo?`<img class="dspho" src="${p.photo}">`:`<div class="dsphp">👤</div>`;
+  const fl=p.country?`<img class="dsfl" src="${furl(p.country)}" onerror="this.style.display='none'">`:'';
+  const dots=[0,1].map(i=>`<div class="dsl ${i<l?'h':''}"></div>`).join('');
+  return`<div class="dsp">${ph}${fl}
+    <div class="dsnm">${p.lastName}<span>${p.firstName}</span></div>
+    <div class="dsls">${dots}</div></div>`;
 }
 
-function dsRanking(cs){
-  const total=cs.players.length;
-  let h=`<div class="dsrank"><div class="dsrank-title">Ranking</div>`;
-  for(let rank=1;rank<=Math.min(total,10);rank++){
-    // eliminated[0]=first eliminated=last place, eliminated[total-1]=winner=1st place
-    const pid=cs.eliminated[total-rank];
-    const rc=rank===1?'p1':rank===2?'p2':rank===3?'p3':'';
-    h+=`<div class="dsrank-row">
-      <span class="dsrp ${rc}">${rank}</span>
-      ${pid!==undefined?`<span class="dsrn">${pName(pid)}</span>`:`<span class="dsrn dsrn-empty">—</span>`}
+function rnkHtml(cs){
+  const n=cs.players.length;
+  let h=`<div class="drk"><div class="drkt">Ranking</div>`;
+  for(let r=1;r<=Math.min(n,10);r++){
+    // elim[0]=first out=last place, elim[n-1]=champion=1st place
+    const pid=cs.elim[n-r];
+    const rc=r===1?'r1':r===2?'r2':r===3?'r3':'';
+    h+=`<div class="drkr">
+      <span class="drkp ${rc}">${r}</span>
+      ${pid!=null?`<span class="drkn">${pn(pid)}</span>`:`<span class="drkn drke">—</span>`}
     </div>`;
   }
   return h+'</div>';
 }
 
-function dsUpcoming(cs){
-  const wq=[...cs.winnerQ],lq=[...cs.loserQ],pairs=[];
+function upcomingM(cs){
+  const wq=[...cs.wq],lq=[...cs.lq],pairs=[];
   while(wq.length>=2)pairs.push([wq.shift(),wq.shift()]);
   if(wq.length&&lq.length)pairs.push([wq.shift(),lq.shift()]);
   while(lq.length>=2)pairs.push([lq.shift(),lq.shift()]);
   return pairs;
 }
 
-function pName(id){const p=S.players.find(x=>x.id===id);return p?p.lastName+' '+p.firstName:'?';}
+function pn(id){const p=S.players.find(x=>x.id===id);return p?p.lastName+' '+p.firstName:'?';}
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // SCANNER
-// ═══════════════════════════════════════════
-let scanBuf='',scanTmr=null;
-function initScanner(){
+// ════════════════════════════════════════════
+let sbuf='',stmr=null;
+function initScan(){
   document.addEventListener('keydown',e=>{
-    const inField=document.activeElement&&['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
-    if(inField&&!isDisplay())return;
+    const inf=document.activeElement&&['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
+    if(inf&&!isDsp())return;
     if(e.key==='Enter'){
-      if(scanBuf.length>=3)handleScan(scanBuf.trim());
-      scanBuf='';if(scanTmr){clearTimeout(scanTmr);scanTmr=null;}return;
+      if(sbuf.length>=3)onScan(sbuf.trim());
+      sbuf='';if(stmr){clearTimeout(stmr);stmr=null;}return;
     }
-    if(e.key.length===1)scanBuf+=e.key;
-    if(scanTmr)clearTimeout(scanTmr);
-    scanTmr=setTimeout(()=>{scanBuf='';},500);
+    if(e.key.length===1)sbuf+=e.key;
+    if(stmr)clearTimeout(stmr);
+    stmr=setTimeout(()=>{sbuf='';},500);
   });
 }
 
-function handleScan(code){
-  const p=S.players.find(x=>x.barcode===code);
-  if(!p||S.tournament.phase!=='running')return;
-  const secIdx=declareWinner(p.id);
-  if(secIdx>=0){
-    if(isDisplay()){flashScan();renderDisplay();}
-    else{persist();renderAdminDynamic();if(bc)bc.postMessage({type:'sync',data:JSON.stringify(S)});}
+function onScan(code){
+  const p=S.players.find(x=>x.bc===code);
+  if(!p||S.T.phase!=='running')return;
+  const si=doWin(p.id);
+  if(si>=0){
+    save();
+    if(isDsp()){flash();renderDsp();}
+    else{renderAdm();if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});}
   }
 }
 
-function flashScan(){
-  const el=document.getElementById('scan-flash');
-  el.classList.add('on');setTimeout(()=>el.classList.remove('on'),150);
+function flash(){
+  const el=$('sfx');el.classList.add('on');setTimeout(()=>el.classList.remove('on'),150);
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // BARCODE PRINT
-// ═══════════════════════════════════════════
-function openPrintBarcodes(){
+// ════════════════════════════════════════════
+function openBarcodes(){
   if(!S.players.length){alert('No players to print.');return;}
-  const c=document.getElementById('bc-cards');c.innerHTML='';
+  const c=$('bccards');c.innerHTML='';
   S.players.forEach(p=>{
     const cats=(p.entries||[]).map(e=>{
-      const cat=S.categories.find(c=>c.id===e.catId)||{name:'?'};
+      const cat=S.cats.find(c=>c.id===e.cid)||{name:'?'};
       return cat.name+'['+(e.arm==='both'?'L+R':e.arm==='left'?'L':'R')+']';
     }).join('<br>');
     const card=document.createElement('div');
     card.style.cssText='background:#fff;color:#000;border:1px solid #ccc;border-radius:6px;padding:12px 14px;min-width:150px;text-align:center;font-family:monospace';
     card.innerHTML=`<div style="font-size:11px;font-family:sans-serif;font-weight:700;margin-bottom:4px">${p.lastName} ${p.firstName}</div>
-      <div style="font-size:30px;font-weight:900;letter-spacing:5px;margin:6px 0">${p.barcode}</div>
+      <div style="font-size:30px;font-weight:900;letter-spacing:5px;margin:6px 0">${p.bc}</div>
       <div style="font-size:9px;font-family:sans-serif;color:#555;line-height:1.5">${cats}</div>`;
     c.appendChild(card);
   });
-  document.getElementById('modal-barcodes').style.display='flex';
+  $('m-bc').style.display='flex';
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // CSV EXPORT
-// ═══════════════════════════════════════════
-function exportCSV(){
+// ════════════════════════════════════════════
+function doExportCSV(){
   const rows=[['Barcode','LastName','FirstName','Country','Categories']];
   S.players.forEach(p=>{
-    const ctry=COUNTRIES.find(x=>x.c===p.country);
+    const cn=CC.find(x=>x.c===p.country);
     const cats=(p.entries||[]).map(e=>{
-      const cat=S.categories.find(c=>c.id===e.catId)||{name:'?'};
+      const cat=S.cats.find(c=>c.id===e.cid)||{name:'?'};
       return cat.name+'['+(e.arm==='both'?'L+R':e.arm==='left'?'L':'R')+']';
     }).join(' | ');
-    rows.push([p.barcode,p.lastName,p.firstName,ctry?ctry.n:'',cats]);
+    rows.push([p.bc,p.lastName,p.firstName,cn?cn.n:'',cats]);
   });
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a');
@@ -977,26 +1037,27 @@ function exportCSV(){
   a.download='registrations.csv';a.click();
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // CLOCK
-// ═══════════════════════════════════════════
-function startClock(){
-  const upd=()=>setEl('dclock',new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
+// ════════════════════════════════════════════
+function tick(){
+  const upd=()=>tx('dclk',new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
   upd();setInterval(upd,1000);
 }
 
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 // UTILS
-// ═══════════════════════════════════════════
+// ════════════════════════════════════════════
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}}
-function setEl(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
-function setDisp(id,show){const e=document.getElementById(id);if(e)e.style.display=show?'':'none';}
-function closeModal(id){document.getElementById(id).style.display='none';}
-function closeOut(e,id){if(e.target===e.currentTarget)closeModal(id);}
-function confirm2(title,msg,cb){
-  setEl('mc-title',title);setEl('mc-msg',msg);
-  document.getElementById('mc-ok').onclick=()=>{closeModal('modal-confirm');cb();};
-  document.getElementById('modal-confirm').style.display='flex';
+const $=id=>document.getElementById(id);
+function tx(id,v){const e=$(id);if(e)e.textContent=v;}
+function sd(id,show){const e=$(id);if(e)e.style.display=show?'':'none';}
+function closeM(id){$(id).style.display='none';}
+function closeOut(e,id){if(e.target===e.currentTarget)closeM(id);}
+function ask(title,msg,cb){
+  tx('cftitle',title);tx('cfmsg',msg);
+  $('cfok').onclick=()=>{closeM('m-confirm');cb();};
+  $('m-confirm').style.display='flex';
 }
 </script>
 </body>
