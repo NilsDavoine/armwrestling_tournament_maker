@@ -122,6 +122,35 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
 #webcam-video{width:100%;border-radius:8px;background:#000}
 #webcam-canvas{display:none}
+
+/* ── PODIUM ── */
+.podium-wrap{flex:1;display:flex;flex-direction:column;align-items:center;overflow:hidden;padding:10px 6px 0}
+.podium-title{font-family:var(--fd);font-size:20px;font-weight:900;color:var(--green);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin-bottom:6px}
+.podium-slot{display:flex;flex-direction:column;align-items:center;gap:4px}
+.podium-medal{font-size:28px;line-height:1}
+.podium-player-info{text-align:center}
+.podium-pname{font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;line-height:1.1}
+.podium-pfname{font-family:var(--fd);font-size:11px;font-weight:400;color:var(--muted)}
+.podium-block{display:flex;align-items:center;justify-content:center;border:2px solid var(--accent);border-bottom:none;font-family:var(--fd);font-weight:900;color:var(--accent);min-width:70px}
+.podium-block.p1{height:80px;font-size:32px;background:rgba(232,200,64,.08)}
+.podium-block.p2{height:58px;font-size:28px;background:rgba(255,255,255,.04)}
+.podium-block.p3{height:42px;font-size:24px;background:rgba(255,255,255,.02)}
+.podium-next{background:rgba(232,200,64,.07);border:1px solid rgba(232,200,64,.25);border-radius:8px;padding:8px 14px;margin:6px 10px 0;text-align:center}
+.podium-next-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.podium-next-name{font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:1px}
+
+/* ── SCHEDULE TAB ── */
+.sched-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.sched-col{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;min-height:300px}
+.sched-col h4{font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:10px;color:var(--a2);text-transform:uppercase;letter-spacing:.5px}
+.sched-item{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;margin-bottom:6px;cursor:grab;user-select:none;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;transition:background .15s;position:relative}
+.sched-item:active{cursor:grabbing;background:var(--border)}
+.sched-item.drag-over-top{border-top:2px solid var(--accent)}
+.sched-item.drag-over-bot{border-bottom:2px solid var(--accent)}
+.sched-drop-zone{min-height:60px;border:2px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;transition:border-color .15s}
+.sched-drop-zone.drag-over{border-color:var(--accent);background:rgba(232,200,64,.04)}
+.sched-count{font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);min-width:24px;text-align:right;margin-left:auto}
 .ccr{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:6px}
 .ccl{flex:1;cursor:pointer;margin:0;font-size:13px;font-weight:600;color:var(--text);text-transform:none;letter-spacing:0}
 .cca{display:none;gap:10px}.cca.on{display:flex}
@@ -143,6 +172,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="tabs">
     <div class="tab on" onclick="showTab('reg')">Registrations</div>
     <div class="tab" onclick="showTab('cats')">Categories</div>
+    <div class="tab" onclick="showTab('sched')">Schedule</div>
     <div class="tab" onclick="showTab('ctrl')">Tournament Control</div>
   </div>
   <div class="ab">
@@ -202,6 +232,33 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
     </div>
 
+    <!-- ── SCHEDULE ── -->
+    <div id="t-sched" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <h4 style="font-family:var(--fd);font-size:18px;font-weight:700">Category Schedule</h4>
+        <span style="color:var(--muted);font-size:12px">Drag categories between sections and reorder within each section. This order will be used when the tournament starts.</span>
+        <button class="btn btn-n sm" style="margin-left:auto" onclick="resetSched()">↺ Reset to default order</button>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn btn-b sm" onclick="schedArm('left')" id="sched-btn-left">Left Arm</button>
+        <button class="btn btn-n sm" onclick="schedArm('right')" id="sched-btn-right">Right Arm</button>
+      </div>
+      <div class="sched-grid" id="sched-grid">
+        <div class="sched-col" id="sched-col-0">
+          <h4>Section 1<br><span style="font-size:10px;font-weight:400;color:var(--muted)">Sub-Juniors → Women</span></h4>
+          <div id="sched-list-0" class="sched-drop-zone" ondragover="schedDragOver(event,0)" ondrop="schedDrop(event,0)" ondragleave="schedDragLeave(event,0)">Drop here</div>
+        </div>
+        <div class="sched-col" id="sched-col-1">
+          <h4>Section 2<br><span style="font-size:10px;font-weight:400;color:var(--muted)">Juniors → Masters</span></h4>
+          <div id="sched-list-1" class="sched-drop-zone" ondragover="schedDragOver(event,1)" ondrop="schedDrop(event,1)" ondragleave="schedDragLeave(event,1)">Drop here</div>
+        </div>
+        <div class="sched-col" id="sched-col-2">
+          <h4>Section 3<br><span style="font-size:10px;font-weight:400;color:var(--muted)">Amateurs → Senior Pro</span></h4>
+          <div id="sched-list-2" class="sched-drop-zone" ondragover="schedDragOver(event,2)" ondrop="schedDrop(event,2)" ondragleave="schedDragLeave(event,2)">Drop here</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── CONTROL ── -->
     <div id="t-ctrl" style="display:none">
       <div class="kbox">
@@ -223,7 +280,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
         </div>
         <div class="shint">
           <div class="dot"></div>
-          <span>Barcode scanner active — scan a player's barcode to declare them winner. Or use the manual buttons below.</span>
+          <div>
+            <div>Barcode scanner active — scan a player's barcode to declare them winner. Or use the manual buttons below.</div>
+            <div id="scan-fb" style="font-size:12px;font-weight:700;margin-top:4px;opacity:0;transition:opacity .3s">—</div>
+          </div>
         </div>
       </div>
 
@@ -377,7 +437,7 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v9';
+const SK='atm_v10';
 let S=def();
 
 function def(){return{
@@ -467,9 +527,10 @@ function openDisplay(){
 // TABS
 // ════════════════════════════════════════════
 function showTab(t){
-  ['reg','cats','ctrl'].forEach(x=>$('t-'+x).style.display=x===t?'block':'none');
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('on',['reg','cats','ctrl'][i]===t));
+  ['reg','cats','sched','ctrl'].forEach(x=>$('t-'+x).style.display=x===t?'block':'none');
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('on',['reg','cats','sched','ctrl'][i]===t));
   if(t==='cats')renderCats();
+  if(t==='sched')renderSched();
   if(t==='ctrl')renderAdm();
 }
 
@@ -854,16 +915,22 @@ function fillSec(si,item){
 // Launch an arm: fill 3 sections with the first item of each section bucket,
 // store per-section queues so advSec pulls from the right bucket.
 function launchArm(arm){
-  const buckets=buildSectionQueues(arm); // [{cid,arm}[], ...]
+  // Use custom schedule if defined, otherwise use default ordering
+  let buckets;
+  if(S.T.customSched&&S.T.customSched[arm]){
+    // Filter out categories that have no players (may have changed since schedule was set)
+    buckets=S.T.customSched[arm].map(list=>
+      list.filter(item=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===item.cid&&e.arm===item.arm)))
+    );
+  } else {
+    buckets=buildSectionQueues(arm);
+  }
   S.T.secs=[null,null,null];
-  // Per-section queues stored in state (arrays of remaining items after first)
   S.T.secQueues=[buckets[0].slice(1), buckets[1].slice(1), buckets[2].slice(1)];
-  // Fill each section with first item of its bucket
   for(let i=0;i<3;i++){
     if(buckets[i].length>0) fillSec(i,buckets[i][0]);
     else S.T.secs[i]=null;
   }
-  // Legacy queue unused now — keep empty
   S.T.queue=[];
   const total=buckets[0].length+buckets[1].length+buckets[2].length;
   addLog(`${arm.toUpperCase()} ARM started — ${total} categories across 3 sections`);
@@ -1037,12 +1104,7 @@ function renderSec(i){
     <div class="dshs">${sec.arm.toUpperCase()} ARM · ${cs?cs.players.length:0} players</div>
   </div>`;
   if(!cs||sec.done||cs.done){
-    const wid=cs?cs.elim[cs.elim.length-1]:null;
-    const wp=wid!=null?S.players.find(x=>x.id===wid):null;
-    h+=`<div class="done"><div class="done-ic">🏆</div><div class="done-tx">Category Complete</div>`;
-    if(wp)h+=`<div class="done-wn">Winner: ${wp.lastName} ${wp.firstName}</div>`;
-    h+='</div>';
-    if(cs)h+=rnkHtml(cs);
+    h+=podiumHtml(cs, sec);
     el.innerHTML=h;return;
   }
   if(!cs.cur){h+=`<div class="wait">No active match</div>`;el.innerHTML=h;return;}
@@ -1102,28 +1164,63 @@ function pn(id){const p=S.players.find(x=>x.id===id);return p?p.lastName+' '+p.f
 // SCANNER
 // ════════════════════════════════════════════
 let sbuf='',stmr=null;
+
+// ── HOW THE SCANNER WORKS ──
+// A USB barcode scanner types characters like a keyboard, then sends Enter.
+// We capture all keypresses. When Enter arrives we process the buffered string.
+// The 100ms timeout resets the buffer if characters stop coming (human typing is slower).
+// IMPORTANT: scanning is blocked when a text input/select is focused (to allow normal typing).
+// To scan from the admin window, make sure no input field is focused (click on empty space first).
+
 function initScan(){
   document.addEventListener('keydown',e=>{
+    // Block scanning when user is typing in a form field (admin side only)
     const inf=document.activeElement&&['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
     if(inf&&!isDsp())return;
+
     if(e.key==='Enter'){
-      if(sbuf.length>=3)onScan(sbuf.trim());
-      sbuf='';if(stmr){clearTimeout(stmr);stmr=null;}return;
+      const code=sbuf.trim();
+      sbuf='';
+      if(stmr){clearTimeout(stmr);stmr=null;}
+      if(code.length>=3) onScan(code);
+      return;
     }
-    if(e.key.length===1)sbuf+=e.key;
+    // Accept digits, letters and hyphens (typical barcode chars)
+    if(/^[\w\d\-]$/.test(e.key)) sbuf+=e.key;
     if(stmr)clearTimeout(stmr);
-    stmr=setTimeout(()=>{sbuf='';},500);
+    // 100ms window — scanner sends all chars nearly instantly; human typing takes >200ms per key
+    stmr=setTimeout(()=>{sbuf='';},100);
   });
 }
 
 function onScan(code){
   const p=S.players.find(x=>x.bc===code);
-  if(!p||S.T.phase!=='running')return;
+  if(!p){
+    showScanFeedback('⚠ Unknown: '+code, false);
+    return;
+  }
+  if(S.T.phase!=='running'){
+    showScanFeedback('Tournament not started', false);
+    return;
+  }
   const si=doWin(p.id);
   if(si>=0){
+    showScanFeedback('✓ '+p.lastName+' '+p.firstName+' — winner of section '+(si+1), true);
     if(isDsp()){flash();renderDsp();}
     else{renderAdm();}
+  } else {
+    showScanFeedback('⚠ '+p.lastName+' — not in active match', false);
   }
+}
+
+function showScanFeedback(msg, ok){
+  // Show in admin scan indicator
+  const el=$('scan-fb');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.color=ok?'var(--green)':'var(--accent)';
+  el.style.opacity='1';
+  setTimeout(()=>{el.style.opacity='0';},2500);
 }
 
 function flash(){
@@ -1243,6 +1340,176 @@ function doExportCSV(){
 function tick(){
   const upd=()=>tx('dclk',new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}));
   upd();setInterval(upd,1000);
+}
+
+// ════════════════════════════════════════════
+// PODIUM DISPLAY
+// ════════════════════════════════════════════
+function podiumHtml(cs, sec){
+  const n=cs?cs.players.length:0;
+  // elim array: [0]=last place, [n-1]=1st place
+  const get=(rank)=>{ // rank 1-based
+    if(!cs)return null;
+    const pid=cs.elim[n-rank];
+    return pid!=null?S.players.find(x=>x.id===pid):null;
+  };
+  const p1=get(1),p2=get(2),p3=get(3);
+  const medal=(r)=>r===1?'🥇':r===2?'🥈':'🥉';
+  const pblock=(p,rank)=>{
+    if(!p)return'';
+    const ph=p.photo?`<img style="width:54px;height:62px;object-fit:cover;border-radius:6px;border:2px solid ${rank===1?'var(--accent)':'var(--border)'}" src="${p.photo}">`
+      :`<div style="width:54px;height:62px;border-radius:6px;background:var(--bg3);border:2px solid ${rank===1?'var(--accent)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:22px">👤</div>`;
+    const fl=p.country?`<img style="width:28px;height:18px;object-fit:cover;border-radius:2px;border:1px solid var(--border)" src="${furl(p.country)}" onerror="this.style.display='none'">`:'';
+    return `<div class="podium-slot">
+      <div class="podium-medal">${medal(rank)}</div>
+      ${ph}
+      ${fl}
+      <div class="podium-player-info">
+        <div class="podium-pname" style="color:${rank===1?'var(--accent)':rank===2?'#ccc':'#cd7f32'}">${p.lastName}</div>
+        <div class="podium-pfname">${p.firstName}</div>
+      </div>
+      <div class="podium-block p${rank}">${rank}</div>
+    </div>`;
+  };
+
+  // Next category name from section queue
+  const sq=S.T.secQueues?S.T.secQueues[sec?S.T.secs.indexOf(sec):0]:null;
+  const nextItem=sq&&sq.length>0?sq[0]:null;
+  const nextCat=nextItem?S.cats.find(c=>c.id===nextItem.cid):null;
+
+  let h=`<div class="podium-wrap">
+    <div class="podium-title">Category Complete</div>
+    <div class="podium-stage">
+      ${pblock(p2,2)}
+      ${pblock(p1,1)}
+      ${pblock(p3,3)}
+    </div>`;
+
+  if(nextCat&&sec&&sec.waitingAdvance){
+    h+=`<div class="podium-next">
+      <div class="podium-next-lbl">Next Category</div>
+      <div class="podium-next-name">${nextCat.name}</div>
+    </div>`;
+  }
+  h+='</div>';
+  h+=rnkHtml(cs);
+  return h;
+}
+
+// ════════════════════════════════════════════
+// SCHEDULE TAB
+// ════════════════════════════════════════════
+let schedArm_='left';
+let dragItem=null; // {secIdx, itemIdx} being dragged
+
+// S.T.customSched = {left:[{cid,arm}[], {cid,arm}[], {cid,arm}[]], right:[...]}
+// If null, default ordering (buildSectionQueues) is used.
+
+function schedArm(arm){
+  schedArm_=arm;
+  $('sched-btn-left').className='btn sm '+(arm==='left'?'btn-b':'btn-n');
+  $('sched-btn-right').className='btn sm '+(arm==='right'?'btn-r':'btn-n');
+  renderSched();
+}
+
+function renderSched(){
+  schedArm_=schedArm_||'left';
+  $('sched-btn-left').className='btn sm '+(schedArm_==='left'?'btn-b':'btn-n');
+  $('sched-btn-right').className='btn sm '+(schedArm_==='right'?'btn-r':'btn-n');
+  ensureCustomSched();
+  const lists=S.T.customSched[schedArm_];
+  for(let si=0;si<3;si++){
+    const container=$('sched-list-'+si);
+    if(!container)continue;
+    container.className=''; // remove drop-zone class once populated
+    container.innerHTML='';
+    container.ondragover=ev=>schedDragOver(ev,si);
+    container.ondrop=ev=>schedDrop(ev,si);
+    container.ondragleave=ev=>schedDragLeave(ev,si);
+    const items=lists[si]||[];
+    if(!items.length){
+      container.className='sched-drop-zone';
+      container.textContent='Drop here';
+      return;
+    }
+    items.forEach((item,idx)=>{
+      const cat=S.cats.find(c=>c.id===item.cid)||{name:'?'};
+      const count=S.players.filter(p=>(p.entries||[]).some(e=>e.cid===item.cid&&e.arm===item.arm)).length;
+      const div=document.createElement('div');
+      div.className='sched-item';
+      div.draggable=true;
+      div.dataset.si=si;div.dataset.idx=idx;
+      div.innerHTML=`<span class="tag ${item.arm==='left'?'tl':'tr'}" style="font-size:10px;flex-shrink:0">${item.arm==='left'?'L':'R'}</span>
+        <span style="flex:1">${cat.name}</span>
+        <span class="sched-count">${count}</span>`;
+      div.ondragstart=ev=>{
+        dragItem={si,idx};
+        ev.dataTransfer.effectAllowed='move';
+        div.style.opacity='.4';
+      };
+      div.ondragend=()=>{div.style.opacity='1';};
+      div.ondragover=ev=>{
+        ev.preventDefault();ev.stopPropagation();
+        div.classList.remove('drag-over-top','drag-over-bot');
+        const r=div.getBoundingClientRect();
+        div.classList.add(ev.clientY<r.top+r.height/2?'drag-over-top':'drag-over-bot');
+      };
+      div.ondragleave=()=>div.classList.remove('drag-over-top','drag-over-bot');
+      div.ondrop=ev=>{
+        ev.preventDefault();ev.stopPropagation();
+        const r=div.getBoundingClientRect();
+        const before=ev.clientY<r.top+r.height/2;
+        div.classList.remove('drag-over-top','drag-over-bot');
+        if(!dragItem)return;
+        moveSchedItem(dragItem.si,dragItem.idx,si,before?idx:idx+1);
+      };
+      container.appendChild(div);
+    });
+  }
+}
+
+function ensureCustomSched(){
+  if(!S.T.customSched) S.T.customSched={left:null,right:null};
+  ['left','right'].forEach(arm=>{
+    if(!S.T.customSched[arm]){
+      const buckets=buildSectionQueues(arm);
+      S.T.customSched[arm]=buckets;
+    }
+  });
+}
+
+function schedDragOver(ev,si){
+  ev.preventDefault();
+  const c=$('sched-list-'+si);
+  if(c)c.classList.add('drag-over');
+}
+function schedDragLeave(ev,si){
+  const c=$('sched-list-'+si);
+  if(c)c.classList.remove('drag-over');
+}
+function schedDrop(ev,si){
+  ev.preventDefault();
+  const c=$('sched-list-'+si);
+  if(c)c.classList.remove('drag-over');
+  if(!dragItem)return;
+  const lists=S.T.customSched[schedArm_];
+  const targetLen=lists[si]?lists[si].length:0;
+  moveSchedItem(dragItem.si,dragItem.idx,si,targetLen);
+}
+
+function moveSchedItem(fromSi,fromIdx,toSi,toIdx){
+  const lists=S.T.customSched[schedArm_];
+  const item=lists[fromSi].splice(fromIdx,1)[0];
+  if(fromSi===toSi&&fromIdx<toIdx) toIdx--;
+  lists[toSi].splice(toIdx,0,item);
+  save();renderSched();
+}
+
+function resetSched(){
+  if(!S.T.customSched)S.T.customSched={left:null,right:null};
+  S.T.customSched[schedArm_]=null;
+  ensureCustomSched();
+  save();renderSched();
 }
 
 // ════════════════════════════════════════════
