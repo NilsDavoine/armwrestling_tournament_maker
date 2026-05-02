@@ -153,6 +153,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <button class="btn btn-y" onclick="openAdd()">+ Add Player</button>
         <button class="btn btn-n" onclick="doExportCSV()">⬇ Export CSV</button>
         <button class="btn btn-n" onclick="openBarcodes()">🖨 Print Barcodes</button>
+        <button class="btn btn-b" onclick="genBulk()" title="Generate multiple random test players">🎲 Generate test players</button>
         <span id="plbl" style="color:var(--muted);font-size:12px;margin-left:auto">0 players</span>
       </div>
       <div class="tw">
@@ -273,7 +274,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
         </div>
       </div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end">
+    <div style="display:flex;gap:10px;margin-top:20px;align-items:center">
+      <button class="btn btn-b sm" onclick="genRandom()" title="Fill form with random test data">🎲 Random</button>
+      <div style="flex:1"></div>
       <button class="btn btn-n" onclick="closeM('m-player')">Cancel</button>
       <button class="btn btn-y" onclick="savePlayer()">Save Player</button>
     </div>
@@ -370,26 +373,56 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v5';
+const SK='atm_v6';
 let S=def();
 
 function def(){return{
   players:[],
   cats:[
-    {id:0,arm:'left',name:'Sub-juniors -75kg'},{id:1,arm:'left',name:'Juniors -75kg'},
-    {id:2,arm:'left',name:'Amateurs -75kg'},{id:3,arm:'left',name:'Seniors -75kg'},
-    {id:4,arm:'left',name:'Masters -75kg'},{id:5,arm:'left',name:'Professionals -75kg'},
-    {id:6,arm:'left',name:'Open -75kg'},
-    {id:7,arm:'right',name:'Sub-juniors -75kg'},{id:8,arm:'right',name:'Juniors -75kg'},
-    {id:9,arm:'right',name:'Amateurs -75kg'},{id:10,arm:'right',name:'Seniors -75kg'},
-    {id:11,arm:'right',name:'Masters -75kg'},{id:12,arm:'right',name:'Professionals -75kg'},
-    {id:13,arm:'right',name:'Open -75kg'},
+    // LEFT ARM
+    {id:0, arm:'left', name:'Amateurs -75kg'},
+    {id:1, arm:'left', name:'Amateurs -85kg'},
+    {id:2, arm:'left', name:'Amateurs -95kg'},
+    {id:3, arm:'left', name:'Amateurs +95kg'},
+    {id:4, arm:'left', name:'Sub-Juniors -75kg'},
+    {id:5, arm:'left', name:'Sub-Juniors +75kg'},
+    {id:6, arm:'left', name:'Juniors -85kg'},
+    {id:7, arm:'left', name:'Juniors +85kg'},
+    {id:8, arm:'left', name:'Women -65kg'},
+    {id:9, arm:'left', name:'Women +65kg'},
+    {id:10,arm:'left', name:'Masters -85kg'},
+    {id:11,arm:'left', name:'Masters -95kg'},
+    {id:12,arm:'left', name:'Masters +95kg'},
+    {id:13,arm:'left', name:'Senior Pro -75kg'},
+    {id:14,arm:'left', name:'Senior Pro -85kg'},
+    {id:15,arm:'left', name:'Senior Pro -95kg'},
+    {id:16,arm:'left', name:'Senior Pro -105kg'},
+    {id:17,arm:'left', name:'Senior Pro +105kg'},
+    // RIGHT ARM
+    {id:18,arm:'right',name:'Amateurs -75kg'},
+    {id:19,arm:'right',name:'Amateurs -85kg'},
+    {id:20,arm:'right',name:'Amateurs -95kg'},
+    {id:21,arm:'right',name:'Amateurs +95kg'},
+    {id:22,arm:'right',name:'Sub-Juniors -75kg'},
+    {id:23,arm:'right',name:'Sub-Juniors +75kg'},
+    {id:24,arm:'right',name:'Juniors -85kg'},
+    {id:25,arm:'right',name:'Juniors +85kg'},
+    {id:26,arm:'right',name:'Women -65kg'},
+    {id:27,arm:'right',name:'Women +65kg'},
+    {id:28,arm:'right',name:'Masters -85kg'},
+    {id:29,arm:'right',name:'Masters -95kg'},
+    {id:30,arm:'right',name:'Masters +95kg'},
+    {id:31,arm:'right',name:'Senior Pro -75kg'},
+    {id:32,arm:'right',name:'Senior Pro -85kg'},
+    {id:33,arm:'right',name:'Senior Pro -95kg'},
+    {id:34,arm:'right',name:'Senior Pro -105kg'},
+    {id:35,arm:'right',name:'Senior Pro +105kg'},
   ],
   T:{phase:'setup',curArm:'left',locked:false,queue:[],secs:[null,null,null],done:[]},
   CS:{},
-  pid:1,bid:1001,cid:14,
-  log:[],       // [{ts,txt}]
-  _rlist:null   // saved right arm list
+  pid:1,bid:1001,cid:36,
+  log:[],
+  _rlist:null
 };}
 
 function save(){
@@ -412,7 +445,9 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(isDsp()){
     document.getElementById('A').style.display='none';
     document.getElementById('D').style.display='flex';
+    // Re-read localStorage every second — handles initial load AND missed BroadcastChannel messages
     renderDsp();tick();initScan();
+    setInterval(()=>{ load(); renderDsp(); }, 1000);
   } else {
     buildCountrySel();
     renderAdm();
@@ -686,12 +721,24 @@ function doWin(wid){
     cs.cur=null;cs.done=true;
     S.T.secs[si].done=true;
     S.T.done.push(csk(cs.cid,cs.arm));
-    const cn=CC.find(x=>x.c===wp?.country);
     addLog(`[${ts}] 🏆 ${cat.name} [${cs.arm.toUpperCase()}] WINNER: ${wname}`);
     if(!isDsp())showWinner(act[0].id,cs.cid);
-    setTimeout(()=>{advSec(si);save();renderAdm();if(isDsp())renderDsp();if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});},3500);
+    // Save + broadcast immediately so display shows winner
+    save();
+    if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
+    // Then advance section after delay
+    setTimeout(()=>{
+      advSec(si);
+      save();
+      renderAdm();
+      if(isDsp())renderDsp();
+      if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
+    },3500);
   } else {
     cs.cur=nxtM(cs);
+    // Broadcast every match result immediately
+    save();
+    if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
   }
   return si;
 }
@@ -761,28 +808,35 @@ function startTournament(){
   if(!S.players.length){alert('No players registered.');return;}
   ask('Start Tournament?','Registrations will be locked. This cannot be undone.',()=>{
     S.T.phase='running';S.T.locked=true;S.T.curArm='left';
-    S.T.done=[];S.CS={};S.log=[];
+    S.T.done=[];S.CS={};S.log=[];S.T.secs=[null,null,null];
     const ll=catList('left');
     S._rlist=catList('right');
     for(let i=0;i<3;i++){
       if(ll[i])fillSec(i,ll[i]);else S.T.secs[i]=null;
     }
     S.T.queue=ll.slice(3);
-    addLog('Tournament started — Left Arm');
+    addLog('Tournament started — Left Arm — '+ll.length+' categories');
     save();renderAdm();
+    if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
   });
 }
 
 function switchArm(){
   ask('Switch to Right Arm?','Left arm is complete. Right arm will now begin.',()=>{
-    S.T.curArm='right';S.CS={};
-    const rl=S._rlist||catList('right');
+    S.T.curArm='right';
+    S.T.secs=[null,null,null];  // reset sections explicitly
+    S.T.done=[];
+    S.CS={};
+    // Always rebuild from scratch — don't rely on cached _rlist
+    const rl=catList('right');
     for(let i=0;i<3;i++){
       if(rl[i])fillSec(i,rl[i]);else S.T.secs[i]=null;
     }
     S.T.queue=rl.slice(3);
-    addLog('Switched to Right Arm');
+    addLog('Switched to Right Arm — '+rl.length+' categories');
     save();renderAdm();
+    // Force broadcast so display updates immediately
+    if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
   });
 }
 
@@ -798,7 +852,7 @@ function resetTournament(){
 function manualWin(pid){
   const p=S.players.find(x=>x.id===pid);if(!p)return;
   const si=doWin(pid);
-  if(si>=0){save();renderAdm();if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});}
+  if(si>=0){renderAdm();}
   else alert('Player is not in an active match right now.');
 }
 
@@ -987,9 +1041,8 @@ function onScan(code){
   if(!p||S.T.phase!=='running')return;
   const si=doWin(p.id);
   if(si>=0){
-    save();
     if(isDsp()){flash();renderDsp();}
-    else{renderAdm();if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});}
+    else{renderAdm();}
   }
 }
 
@@ -998,8 +1051,76 @@ function flash(){
 }
 
 // ════════════════════════════════════════════
-// BARCODE PRINT
+// RANDOM PLAYER GENERATOR (testing)
 // ════════════════════════════════════════════
+const RNAMES=[
+  ['SMITH','James'],['JOHNSON','Robert'],['WILLIAMS','Michael'],['JONES','David'],
+  ['BROWN','Richard'],['DAVIS','Joseph'],['MILLER','Thomas'],['WILSON','Charles'],
+  ['MOORE','Christopher'],['TAYLOR','Daniel'],['ANDERSON','Matthew'],['THOMAS','Anthony'],
+  ['JACKSON','Mark'],['WHITE','Donald'],['HARRIS','Steven'],['MARTIN','Paul'],
+  ['THOMPSON','Andrew'],['GARCIA','Joshua'],['MARTINEZ','Kenneth'],['ROBINSON','Kevin'],
+  ['CLARK','Brian'],['RODRIGUEZ','George'],['LEWIS','Timothy'],['LEE','Ronald'],
+  ['WALKER','Edward'],['HALL','Jason'],['ALLEN','Jeffrey'],['YOUNG','Ryan'],
+  ['HERNANDEZ','Jacob'],['KING','Gary'],['WRIGHT','Nicholas'],['LOPEZ','Eric'],
+  ['HILL','Jonathan'],['SCOTT','Stephen'],['GREEN','Larry'],['ADAMS','Justin'],
+  ['BAKER','Scott'],['GONZALEZ','Brandon'],['NELSON','Benjamin'],['CARTER','Samuel'],
+  ['MITCHELL','Raymond'],['PEREZ','Gregory'],['ROBERTS','Frank'],['TURNER','Alexander'],
+  ['PHILLIPS','Patrick'],['CAMPBELL','Jack'],['PARKER','Dennis'],['EVANS','Jerry'],
+  ['EDWARDS','Tyler'],['COLLINS','Aaron'],['STEWART','Jose'],['SANCHEZ','Adam'],
+  ['MORRIS','Nathan'],['ROGERS','Henry'],['REED','Zachary'],['COOK','Douglas'],
+  ['MORGAN','Peter'],['BELL','Kyle'],['MURPHY','Walter'],['BAILEY','Ethan'],
+  ['RIVERA','Jeremy'],['COOPER','Harold'],['RICHARDSON','Keith'],['COX','Christian'],
+  ['HOWARD','Roger'],['WARD','Noah'],['TORRES','Gerald'],['PETERSON','Carl'],
+  ['GRAY','Terry'],['RAMIREZ','Sean'],['JAMES','Austin'],['WATSON','Arthur'],
+  ['BROOKS','Lawrence'],['KELLY','Jesse'],['SANDERS','Dylan'],['PRICE','Bryan'],
+  ['BENNETT','Joe'],['WOOD','Jordan'],['BARNES','Billy'],['ROSS','Bruce'],
+  ['HENDERSON','Fred'],['COLEMAN','Bobby'],['JENKINS','Logan'],['PERRY','Albert'],
+  ['POWELL','Johnny'],['LONG','Wayne'],['PATTERSON','Ralph'],['HUGHES','Roy'],
+  ['FLORES','Eugene'],['WASHINGTON','Randy'],['BUTLER','Louis'],['SIMMONS','Philip'],
+  ['FOSTER','Vincent'],['GONZALES','Russell'],['BRYANT','Elijah'],['ALEXANDER','Leonard'],
+  ['RUSSELL','Liam'],['GRIFFIN','Oscar'],['DIAZ','Carlos'],['HAYES','Felix'],
+  ['DUBOIS','Antoine'],['MULLER','Hans'],['FERRARI','Marco'],['GARCIA','Pablo'],
+  ['KOWALSKI','Piotr'],['NOVAK','Jan'],['PETROV','Ivan'],['POPESCU','Alexandru'],
+];
+
+function randItem(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+function genRandom(){
+  if(S.T.locked){alert('Registrations are locked.');return;}
+  // Pick random name + country
+  const [ln,fn]=randItem(RNAMES);
+  const country=randItem(CC).c;
+  // Pick 1-3 random categories
+  const shuffledCats=[...S.cats].sort(()=>Math.random()-.5);
+  const numCats=Math.floor(Math.random()*2)+1; // 1 or 2 cats
+  const chosen=shuffledCats.slice(0,numCats);
+  const arms=['left','right','both'];
+  const entries=chosen.map(c=>({cid:c.id,arm:randItem(arms)}));
+
+  // Fill the form
+  $('pln').value=ln;
+  $('pfn').value=fn;
+  $('pco').value=country;
+  buildCatCBs(entries);
+  setPP(null);pph=null;
+}
+
+function genBulk(){
+  if(S.T.locked){alert('Registrations are locked.');return;}
+  const n=parseInt(prompt('How many random players to generate?','10'));
+  if(!n||n<1||n>200){return;}
+  for(let i=0;i<n;i++){
+    const [ln,fn]=randItem(RNAMES);
+    const country=randItem(CC).c;
+    const shuffledCats=[...S.cats].sort(()=>Math.random()-.5);
+    const numCats=Math.floor(Math.random()*2)+1;
+    const chosen=shuffledCats.slice(0,numCats);
+    const arms=['left','right','both'];
+    const entries=chosen.map(c=>({cid:c.id,arm:randItem(arms)}));
+    S.players.push({id:S.pid++,bc:String(S.bid++),lastName:ln,firstName:fn,country,photo:null,entries});
+  }
+  save();renderAdm();
+}
 function openBarcodes(){
   if(!S.players.length){alert('No players to print.');return;}
   const c=$('bccards');c.innerHTML='';
