@@ -149,6 +149,20 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
     <!-- ── REGISTRATIONS ── -->
     <div id="t-reg">
+      <!-- category counts injected by renderCatCounts() -->
+      <div style="margin-bottom:16px">
+        <h4 style="font-family:var(--fd);font-size:15px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Players per category</h4>
+        <div class="cgrid" style="gap:12px">
+          <div class="cbox" style="padding:12px">
+            <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:var(--a2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Left Arm</div>
+            <div id="ccl"></div>
+          </div>
+          <div class="cbox" style="padding:12px">
+            <div style="font-family:var(--fd);font-size:13px;font-weight:700;color:#ff8888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Right Arm</div>
+            <div id="ccr"></div>
+          </div>
+        </div>
+      </div>
       <div class="tbar">
         <button class="btn btn-y" onclick="openAdd()">+ Add Player</button>
         <button class="btn btn-n" onclick="doExportCSV()">⬇ Export CSV</button>
@@ -308,16 +322,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 </div>
 
-<!-- Category Winner -->
-<div id="m-winner" class="ov" style="display:none">
-  <div class="modal" style="width:400px;text-align:center">
-    <div style="font-size:56px;margin-bottom:8px">🏆</div>
-    <h2 style="font-size:32px;text-align:center">WINNER!</h2>
-    <div id="wname" style="font-family:var(--fd);font-size:26px;font-weight:700;color:#fff;margin:8px 0 4px"></div>
-    <div id="wcat" style="color:var(--muted);font-size:13px;margin-bottom:20px"></div>
-    <button class="btn btn-y" onclick="closeM('m-winner')" style="width:100%;justify-content:center">Continue →</button>
-  </div>
-</div>
 
 <!-- Print Barcodes -->
 <div id="m-bc" class="ov" style="display:none" onclick="closeOut(event,'m-bc')">
@@ -373,7 +377,7 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v6';
+const SK='atm_v8';
 let S=def();
 
 function def(){return{
@@ -722,21 +726,12 @@ function doWin(wid){
     S.T.secs[si].done=true;
     S.T.done.push(csk(cs.cid,cs.arm));
     addLog(`[${ts}] 🏆 ${cat.name} [${cs.arm.toUpperCase()}] WINNER: ${wname}`);
-    if(!isDsp())showWinner(act[0].id,cs.cid);
-    // Save + broadcast immediately so display shows winner
+    // Mark section as waiting for manual "Next Category" press — display keeps showing winner/ranking
+    S.T.secs[si].waitingAdvance=true;
     save();
     if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
-    // Then advance section after delay
-    setTimeout(()=>{
-      advSec(si);
-      save();
-      renderAdm();
-      if(isDsp())renderDsp();
-      if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
-    },3500);
   } else {
     cs.cur=nxtM(cs);
-    // Broadcast every match result immediately
     save();
     if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
   }
@@ -749,42 +744,90 @@ function addLog(txt){
   if(S.log.length>100)S.log.pop();
 }
 
-function showWinner(pid,cid){
-  const p=S.players.find(x=>x.id===pid);
-  const cat=S.cats.find(c=>c.id===cid)||{name:'?'};
-  if(!p)return;
-  $('wname').textContent=p.lastName+' '+p.firstName;
-  $('wcat').textContent='Category: '+cat.name;
-  $('m-winner').style.display='flex';
+// Called from admin ctrl tab — launches next category in a section that is done
+function launchNext(si){
+  advSec(si);
+  save();
+  renderAdm();
+  if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
 }
 
 function advSec(si){
-  const q=S.T.queue;
+  // Clear waitingAdvance flag on current section before moving on
+  if(S.T.secs[si]) S.T.secs[si].waitingAdvance=false;
+
+  // Pull next item from this section's own queue
+  if(!S.T.secQueues) S.T.secQueues=[[],[],[]];
+  const q=S.T.secQueues[si]||[];
+  S.T.secQueues[si]=q;
+
   if(!q.length){
-    if(S.T.secs.every(s=>!s||s.done)){
+    // No more categories for this section
+    S.T.secs[si]=null;
+    // Check if the whole arm is now done (all sections empty or done with no queue)
+    const allEmpty=S.T.secs.every(s=>!s);
+    const allDone=S.T.secs.every(s=>!s||(s.done&&!s.waitingAdvance));
+    if(allEmpty||allDone){
       if(S.T.curArm==='right'){S.T.phase='done';addLog('🎉 Tournament complete!');}
+      // For left arm, the switch button appears automatically via renderCtrl
     }
-    S.T.secs[si]=null;return;
+    return;
   }
+
   const nx=q.shift();
-  const key=csk(nx.cid,nx.arm);
-  S.CS[key]=initCS(nx.cid,nx.arm);
-  const cs=S.CS[key];
-  const cat=S.cats.find(c=>c.id===nx.cid)||{name:'?'};
-  addLog(`Section ${si+1}: starting ${cat.name} [${nx.arm.toUpperCase()}] — ${cs.players.length} players`);
-  if(cs.players.length<2){
-    cs.done=true;S.T.secs[si]={cid:nx.cid,arm:nx.arm,key,done:true};
-    advSec(si);return;
-  }
-  cs.cur=nxtM(cs);
-  S.T.secs[si]={cid:nx.cid,arm:nx.arm,key,done:false};
+  fillSec(si,nx);
 }
 
+// Section assignment preference:
+//   Section 0 → Sub-Juniors, then Women
+//   Section 1 → Juniors, then Masters
+//   Section 2 → Amateurs, then Senior Pro
+// Within each group, all weight classes in order, then overflow to next section.
+// catGroup returns 0-5 priority group index for a category name.
+function catGroup(name){
+  const n=name.toLowerCase();
+  if(n.includes('sub'))  return 0; // Sub-Juniors  → section 0
+  if(n.includes('junior')) return 1; // Juniors      → section 1
+  if(n.includes('amateur')) return 2; // Amateurs     → section 2
+  if(n.includes('women'))   return 3; // Women        → section 0 (second round)
+  if(n.includes('master'))  return 4; // Masters      → section 1 (second round)
+  if(n.includes('senior') || n.includes('pro')) return 5; // Senior Pro → section 2 (second round)
+  return 6; // anything else goes last
+}
+
+// Preferred section for a group index (wraps: group 3→sec 0, 4→sec 1, 5→sec 2)
+function prefSec(groupIdx){ return groupIdx % 3; }
+
+// Build an ordered list of {cid,arm,sec} items respecting section preferences.
+// Returns {sec0:[...], sec1:[...], sec2:[...]} where each list is the queue
+// for that section, and overflow items are appended to the shared queue.
 function catList(arm){
-  return S.cats
+  const cats=S.cats
     .filter(c=>c.arm===arm)
-    .filter(c=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===c.id&&(e.arm===arm||e.arm==='both'))))
-    .map(c=>({cid:c.id,arm}));
+    .filter(c=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===c.id&&(e.arm===arm||e.arm==='both'))));
+  // Sort by group then by original order within group
+  cats.sort((a,b)=>{
+    const ga=catGroup(a.name), gb=catGroup(b.name);
+    if(ga!==gb) return ga-gb;
+    return S.cats.indexOf(a)-S.cats.indexOf(b);
+  });
+  return cats.map(c=>({cid:c.id,arm}));
+}
+
+// Build three per-section queues + one overflow queue from the sorted catList.
+// Returns an array of all items in the order they should be assigned:
+// first item for sec0, first for sec1, first for sec2, then overflow in order.
+function buildSectionQueues(arm){
+  const all=catList(arm);
+  // Bucket items by preferred section
+  const buckets=[[],[],[]];
+  all.forEach(item=>{
+    const cat=S.cats.find(c=>c.id===item.cid);
+    const grp=cat?catGroup(cat.name):6;
+    const sec=prefSec(grp);
+    buckets[sec].push(item);
+  });
+  return buckets; // buckets[0] = items for section 0, etc.
 }
 
 function fillSec(si,item){
@@ -794,28 +837,41 @@ function fillSec(si,item){
   const cat=S.cats.find(c=>c.id===item.cid)||{name:'?'};
   addLog(`Section ${si+1}: starting ${cat.name} [${item.arm.toUpperCase()}] — ${cs.players.length} players`);
   if(cs.players.length<2){
-    cs.done=true;S.T.secs[si]={cid:item.cid,arm:item.arm,key,done:true};
+    cs.done=true;
+    S.T.secs[si]={cid:item.cid,arm:item.arm,key,done:true,waitingAdvance:true};
   } else {
     cs.cur=nxtM(cs);
-    S.T.secs[si]={cid:item.cid,arm:item.arm,key,done:false};
+    S.T.secs[si]={cid:item.cid,arm:item.arm,key,done:false,waitingAdvance:false};
   }
 }
 
 // ════════════════════════════════════════════
 // TOURNAMENT CONTROL
 // ════════════════════════════════════════════
+// Launch an arm: fill 3 sections with the first item of each section bucket,
+// store per-section queues so advSec pulls from the right bucket.
+function launchArm(arm){
+  const buckets=buildSectionQueues(arm); // [{cid,arm}[], ...]
+  S.T.secs=[null,null,null];
+  // Per-section queues stored in state (arrays of remaining items after first)
+  S.T.secQueues=[buckets[0].slice(1), buckets[1].slice(1), buckets[2].slice(1)];
+  // Fill each section with first item of its bucket
+  for(let i=0;i<3;i++){
+    if(buckets[i].length>0) fillSec(i,buckets[i][0]);
+    else S.T.secs[i]=null;
+  }
+  // Legacy queue unused now — keep empty
+  S.T.queue=[];
+  const total=buckets[0].length+buckets[1].length+buckets[2].length;
+  addLog(`${arm.toUpperCase()} ARM started — ${total} categories across 3 sections`);
+}
+
 function startTournament(){
   if(!S.players.length){alert('No players registered.');return;}
   ask('Start Tournament?','Registrations will be locked. This cannot be undone.',()=>{
     S.T.phase='running';S.T.locked=true;S.T.curArm='left';
-    S.T.done=[];S.CS={};S.log=[];S.T.secs=[null,null,null];
-    const ll=catList('left');
-    S._rlist=catList('right');
-    for(let i=0;i<3;i++){
-      if(ll[i])fillSec(i,ll[i]);else S.T.secs[i]=null;
-    }
-    S.T.queue=ll.slice(3);
-    addLog('Tournament started — Left Arm — '+ll.length+' categories');
+    S.T.done=[];S.CS={};S.log=[];
+    launchArm('left');
     save();renderAdm();
     if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
   });
@@ -824,18 +880,10 @@ function startTournament(){
 function switchArm(){
   ask('Switch to Right Arm?','Left arm is complete. Right arm will now begin.',()=>{
     S.T.curArm='right';
-    S.T.secs=[null,null,null];  // reset sections explicitly
     S.T.done=[];
     S.CS={};
-    // Always rebuild from scratch — don't rely on cached _rlist
-    const rl=catList('right');
-    for(let i=0;i<3;i++){
-      if(rl[i])fillSec(i,rl[i]);else S.T.secs[i]=null;
-    }
-    S.T.queue=rl.slice(3);
-    addLog('Switched to Right Arm — '+rl.length+' categories');
+    launchArm('right');
     save();renderAdm();
-    // Force broadcast so display updates immediately
     if(ch)ch.postMessage({t:'sync',d:JSON.stringify(S)});
   });
 }
@@ -857,9 +905,29 @@ function manualWin(pid){
 }
 
 // ════════════════════════════════════════════
+// CATEGORY COUNTS
+// ════════════════════════════════════════════
+function renderCatCounts(){
+  ['left','right'].forEach(arm=>{
+    const el=$(arm==='left'?'ccl':'ccr');
+    if(!el)return;
+    const cats=S.cats.filter(c=>c.arm===arm);
+    if(!cats.length){el.innerHTML='<div style="color:var(--muted);font-size:12px">No categories</div>';return;}
+    el.innerHTML=cats.map(cat=>{
+      const count=S.players.filter(p=>(p.entries||[]).some(e=>e.cid===cat.id&&(e.arm===arm||e.arm==='both'))).length;
+      const bar=count>0?`<div style="background:${arm==='left'?'var(--a2)':'#ff7070'};height:4px;border-radius:2px;width:${Math.min(count*8,100)}%;margin-top:3px;opacity:.5"></div>`:'';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1;font-size:12px;color:${count>0?'var(--text)':'var(--muted)'}">${cat.name}</div>
+        <div style="font-family:var(--fd);font-size:18px;font-weight:700;color:${count>0?'var(--accent)':'var(--muted)'};min-width:28px;text-align:right">${count}</div>
+      </div>`;
+    }).join('');
+  });
+}
+
+// ════════════════════════════════════════════
 // ADMIN RENDER
 // ════════════════════════════════════════════
-function renderAdm(){renderTable();renderCtrl();}
+function renderAdm(){renderTable();renderCatCounts();renderCtrl();}
 
 function renderCtrl(){
   const T=S.T;
@@ -874,7 +942,10 @@ function renderCtrl(){
   }
 
   const showStart=T.phase==='setup'&&S.players.length>0;
-  const leftDone=T.phase==='running'&&T.curArm==='left'&&!T.queue.length&&T.secs.every(s=>!s||s.done);
+  // Left arm done = running, left arm, all sections either null or done+not-waiting
+  const allSecsDone=T.secs.every(s=>!s||(s.done&&!s.waitingAdvance));
+  const allSecsQueuesEmpty=!S.T.secQueues||S.T.secQueues.every(q=>!q||!q.length);
+  const leftDone=T.phase==='running'&&T.curArm==='left'&&allSecsDone&&allSecsQueuesEmpty;
   sd('hdr-start',showStart);sd('hdr-reset',T.phase!=='setup');
   sd('btn-start',T.phase==='setup');
   sd('btn-switch',leftDone);
@@ -900,8 +971,14 @@ function renderCtrl(){
       if(sec.done){
         const wid=cs?cs.elim[cs.elim.length-1]:null;
         const wp=wid!=null?S.players.find(x=>x.id===wid):null;
-        h+=`<div style="color:var(--green);font-weight:700;margin-bottom:4px">✓ Complete</div>`;
-        if(wp)h+=`<div style="font-size:12px;color:var(--accent)">🏆 ${wp.lastName} ${wp.firstName}</div>`;
+        h+=`<div style="color:var(--green);font-weight:700;margin-bottom:6px">✓ Complete</div>`;
+        if(wp)h+=`<div style="font-size:13px;color:var(--accent);margin-bottom:10px">🏆 Winner: <b>${wp.lastName} ${wp.firstName}</b></div>`;
+        // Show launch button only if waitingAdvance and there is a next cat in queue (or queue could be empty)
+        if(sec.waitingAdvance){
+          const hasNext=S.T.secQueues&&S.T.secQueues[i]&&S.T.secQueues[i].length>0;
+          h+=`<button class="btn btn-y" style="width:100%;justify-content:center;margin-top:4px" onclick="launchNext(${i})">
+            ${hasNext?'▶ Launch next category':'⏹ End recap'}</button>`;
+        }
       } else if(cs&&cs.cur){
         const p1=S.players.find(x=>x.id===cs.cur.p1),p2=S.players.find(x=>x.id===cs.cur.p2);
         const sp1=cs.players.find(x=>x.id===cs.cur.p1),sp2=cs.players.find(x=>x.id===cs.cur.p2);
