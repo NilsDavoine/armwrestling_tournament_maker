@@ -618,7 +618,7 @@ function renderTable(){
     const ctags=(p.entries||[]).map(e=>{
       const cat=S.cats.find(c=>c.id===e.cid)||{name:'?',arm:'left'};
       const al=e.arm==='left'?'L':'R';
-      return `<span class="tag ${cat.arm==='left'?'tl':'tr'}" style="margin:1px 2px 1px 0">${cat.name} [${al}]</span>`;
+      return `<span class="tag ${e.arm==='left'?'tl':'tr'}" style="margin:1px 2px 1px 0">${cat.name} [${al}]</span>`;
     }).join('')||'—';
     return `<tr>
       <td><span class="bc">${p.bc}</span></td>
@@ -1174,8 +1174,8 @@ function genRandom(){
   const shuffledCats=[...S.cats].sort(()=>Math.random()-.5);
   const numCats=Math.floor(Math.random()*2)+1; // 1 or 2 cats
   const chosen=shuffledCats.slice(0,numCats);
-  const arms=['left','right'];
-  const entries=chosen.map(c=>({cid:c.id,arm:randItem(arms)}));
+  // arm is always the category's own arm — left cats → 'left', right cats → 'right'
+  const entries=chosen.map(c=>({cid:c.id,arm:c.arm}));
 
   // Fill the form
   $('pln').value=ln;
@@ -1195,8 +1195,7 @@ function genBulk(){
     const shuffledCats=[...S.cats].sort(()=>Math.random()-.5);
     const numCats=Math.floor(Math.random()*2)+1;
     const chosen=shuffledCats.slice(0,numCats);
-    const arms=['left','right'];
-    const entries=chosen.map(c=>({cid:c.id,arm:randItem(arms)}));
+    const entries=chosen.map(c=>({cid:c.id,arm:c.arm}));
     S.players.push({id:S.pid++,bc:String(S.bid++),lastName:ln,firstName:fn,country,photo:null,entries});
   }
   save();renderAdm();
