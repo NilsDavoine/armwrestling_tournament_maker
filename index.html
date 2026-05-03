@@ -154,16 +154,33 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .podium-rank-empty{color:rgba(255,255,255,.12);font-style:italic;font-size:10px}
 
 /* ── SCHEDULE TAB ── */
-.sched-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.sched-col{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;min-height:300px}
-.sched-col h4{font-family:var(--fd);font-size:16px;font-weight:700;margin-bottom:10px;color:var(--a2);text-transform:uppercase;letter-spacing:.5px}
-.sched-item{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 10px;margin-bottom:6px;cursor:grab;user-select:none;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;transition:background .15s;position:relative}
-.sched-item:active{cursor:grabbing;background:var(--border)}
+.sched-layout{display:grid;grid-template-columns:220px 1fr;gap:14px;align-items:start}
+.sched-pool{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;position:sticky;top:0}
+.sched-pool-title{font-family:var(--fd);font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.sched-pool-empty{color:var(--muted);font-size:11px;font-style:italic;padding:8px 0;text-align:center}
+.sched-pool-item{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 10px;margin-bottom:5px;cursor:grab;user-select:none;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;transition:background .12s}
+.sched-pool-item:hover{background:var(--border)}
+.sched-pool-item:active{cursor:grabbing}
+.sched-pool-item.dragging{opacity:.35}
+.sched-pool-drop{border:2px dashed var(--border);border-radius:6px;min-height:40px;margin-top:6px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;transition:all .15s}
+.sched-pool-drop.drag-over{border-color:var(--a2);background:rgba(58,140,255,.05)}
+.sched-sections{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.sched-col{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;min-height:280px;display:flex;flex-direction:column}
+.sched-col-head{margin-bottom:10px}
+.sched-col-title{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--a2);text-transform:uppercase;letter-spacing:.5px}
+.sched-col-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.sched-col-body{flex:1;min-height:80px}
+.sched-item{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;margin-bottom:5px;user-select:none;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;transition:background .12s;cursor:grab}
+.sched-item:hover{background:var(--border)}
+.sched-item:active{cursor:grabbing}
+.sched-item.dragging{opacity:.35}
 .sched-item.drag-over-top{border-top:2px solid var(--accent)}
 .sched-item.drag-over-bot{border-bottom:2px solid var(--accent)}
-.sched-drop-zone{min-height:60px;border:2px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;transition:border-color .15s}
+.sched-item-rm{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:0 2px;line-height:1;flex-shrink:0;opacity:.6;transition:opacity .1s}
+.sched-item-rm:hover{opacity:1;color:var(--red)}
+.sched-drop-zone{border:2px dashed var(--border);border-radius:6px;min-height:50px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px;transition:all .15s;margin-top:4px}
 .sched-drop-zone.drag-over{border-color:var(--accent);background:rgba(232,200,64,.04)}
-.sched-count{font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);min-width:24px;text-align:right;margin-left:auto}
+.sched-count{font-family:var(--fd);font-size:16px;font-weight:900;color:var(--accent);min-width:20px;text-align:right;margin-left:auto}
 .ccr{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-bottom:6px}
 .ccl{flex:1;cursor:pointer;margin:0;font-size:13px;font-weight:600;color:var(--text);text-transform:none;letter-spacing:0}
 .cca{display:none;gap:10px}.cca.on{display:flex}
@@ -247,27 +264,57 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
     <!-- ── SCHEDULE ── -->
     <div id="t-sched" style="display:none">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
         <h4 style="font-family:var(--fd);font-size:18px;font-weight:700">Category Schedule</h4>
-        <span style="color:var(--muted);font-size:12px">Drag categories between sections and reorder within each section. This order will be used when the tournament starts.</span>
-        <button class="btn btn-n sm" style="margin-left:auto" onclick="resetSched()">↺ Reset to default order</button>
-      </div>
-      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-        <button class="btn btn-b sm" onclick="schedArm('left')" id="sched-btn-left">Left Arm</button>
-        <button class="btn btn-n sm" onclick="schedArm('right')" id="sched-btn-right">Right Arm</button>
-      </div>
-      <div class="sched-grid" id="sched-grid">
-        <div class="sched-col" id="sched-col-0">
-          <h4>Section 1<br><span style="font-size:10px;font-weight:400;color:var(--muted)">Sub-Juniors → Women</span></h4>
-          <div id="sched-list-0" class="sched-drop-zone" ondragover="schedDragOver(event,0)" ondrop="schedDrop(event,0)" ondragleave="schedDragLeave(event,0)">Drop here</div>
+        <span style="color:var(--muted);font-size:12px">Drag from the pool into a section. Use ✕ to remove from a section back to the pool. Reorder by dragging within a section.</span>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="btn btn-b sm" onclick="schedArm('left')" id="sched-btn-left">Left Arm</button>
+          <button class="btn btn-n sm" onclick="schedArm('right')" id="sched-btn-right">Right Arm</button>
+          <button class="btn btn-n sm" onclick="resetSched()">↺ Reset</button>
         </div>
-        <div class="sched-col" id="sched-col-1">
-          <h4>Section 2<br><span style="font-size:10px;font-weight:400;color:var(--muted)">Juniors → Masters</span></h4>
-          <div id="sched-list-1" class="sched-drop-zone" ondragover="schedDragOver(event,1)" ondrop="schedDrop(event,1)" ondragleave="schedDragLeave(event,1)">Drop here</div>
+      </div>
+      <div class="sched-layout">
+        <!-- Pool of unassigned categories -->
+        <div class="sched-pool">
+          <div class="sched-pool-title">Available</div>
+          <div id="sched-pool-list"></div>
+          <div id="sched-pool-drop" class="sched-pool-drop"
+            ondragover="poolDragOver(event)" ondrop="poolDrop(event)" ondragleave="poolDragLeave(event)">
+            Drop here to unassign
+          </div>
         </div>
-        <div class="sched-col" id="sched-col-2">
-          <h4>Section 3<br><span style="font-size:10px;font-weight:400;color:var(--muted)">Amateurs → Senior Pro</span></h4>
-          <div id="sched-list-2" class="sched-drop-zone" ondragover="schedDragOver(event,2)" ondrop="schedDrop(event,2)" ondragleave="schedDragLeave(event,2)">Drop here</div>
+        <!-- 3 section columns -->
+        <div class="sched-sections">
+          <div class="sched-col">
+            <div class="sched-col-head">
+              <div class="sched-col-title">Section 1</div>
+              <div class="sched-col-sub">Sub-Juniors → Women</div>
+            </div>
+            <div class="sched-col-body" id="sched-list-0"
+              ondragover="schedDragOver(event,0)" ondrop="schedDrop(event,0)" ondragleave="schedDragLeave(event,0)">
+              <div class="sched-drop-zone" id="sched-dz-0">Drop here</div>
+            </div>
+          </div>
+          <div class="sched-col">
+            <div class="sched-col-head">
+              <div class="sched-col-title">Section 2</div>
+              <div class="sched-col-sub">Juniors → Masters</div>
+            </div>
+            <div class="sched-col-body" id="sched-list-1"
+              ondragover="schedDragOver(event,1)" ondrop="schedDrop(event,1)" ondragleave="schedDragLeave(event,1)">
+              <div class="sched-drop-zone" id="sched-dz-1">Drop here</div>
+            </div>
+          </div>
+          <div class="sched-col">
+            <div class="sched-col-head">
+              <div class="sched-col-title">Section 3</div>
+              <div class="sched-col-sub">Amateurs → Senior Pro</div>
+            </div>
+            <div class="sched-col-body" id="sched-list-2"
+              ondragover="schedDragOver(event,2)" ondrop="schedDrop(event,2)" ondragleave="schedDragLeave(event,2)">
+              <div class="sched-drop-zone" id="sched-dz-2">Drop here</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -450,7 +497,7 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v13';
+const SK='atm_v14';
 let S=def();
 
 function def(){return{
@@ -1470,13 +1517,16 @@ function podiumHtml(cs, sec){
 }
 
 // ════════════════════════════════════════════
+// ════════════════════════════════════════════
 // SCHEDULE TAB
 // ════════════════════════════════════════════
-let schedArm_='left';
-let dragItem=null; // {secIdx, itemIdx} being dragged
+// State: S.T.customSched = {left:[[items],[items],[items]], right:...}
+// Pool  = active cats for this arm that are NOT in any section list
+// Sections = 3 arrays of {cid,arm} items in order
 
-// S.T.customSched = {left:[{cid,arm}[], {cid,arm}[], {cid,arm}[]], right:[...]}
-// If null, default ordering (buildSectionQueues) is used.
+let schedArm_='left';
+// dragSrc: {type:'pool'|'section', si?:int, idx:int}
+let dragSrc=null;
 
 function schedArm(arm){
   schedArm_=arm;
@@ -1485,42 +1535,107 @@ function schedArm(arm){
   renderSched();
 }
 
+function ensureCustomSched(){
+  if(!S.T.customSched) S.T.customSched={left:null,right:null};
+  ['left','right'].forEach(arm=>{
+    if(!S.T.customSched[arm]||!S.T.customSched[arm].some(l=>l&&l.length>0)){
+      const buckets=buildSectionQueues(arm);
+      S.T.customSched[arm]=buckets.map(list=>list.map(item=>({...item})));
+    }
+  });
+}
+
+// Returns all valid {cid,arm} items for this arm (active cats with players, not hidden)
+function allSchedItems(arm){
+  return S.cats
+    .filter(c=>c.arm===arm&&!c.hidden)
+    .filter(c=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===c.id&&e.arm===arm)))
+    .map(c=>({cid:c.id,arm}));
+}
+
+// Returns items currently assigned to any section (filtering out deleted/hidden cats)
+function assignedItems(arm){
+  const cs=S.T.customSched[arm]||[[],[],[]];
+  const out=[];
+  cs.forEach(list=>(list||[]).forEach(item=>{
+    const cat=S.cats.find(c=>c.id===item.cid);
+    if(cat&&!cat.hidden) out.push(item);
+  }));
+  return out;
+}
+
+// Pool = allSchedItems minus assignedItems
+function poolItems(arm){
+  const assigned=assignedItems(arm);
+  return allSchedItems(arm).filter(a=>!assigned.some(b=>b.cid===a.cid&&b.arm===a.arm));
+}
+
 function renderSched(){
   schedArm_=schedArm_||'left';
   $('sched-btn-left').className='btn sm '+(schedArm_==='left'?'btn-b':'btn-n');
   $('sched-btn-right').className='btn sm '+(schedArm_==='right'?'btn-r':'btn-n');
   ensureCustomSched();
-  const lists=S.T.customSched[schedArm_];
+  const arm=schedArm_;
+
+  // ── Pool
+  const poolEl=$('sched-pool-list');
+  const pool=poolItems(arm);
+  poolEl.innerHTML='';
+  if(!pool.length){
+    poolEl.innerHTML='<div class="sched-pool-empty">All categories assigned</div>';
+  } else {
+    pool.forEach((item,idx)=>{
+      const cat=S.cats.find(c=>c.id===item.cid)||{name:'?'};
+      const count=S.players.filter(p=>(p.entries||[]).some(e=>e.cid===item.cid&&e.arm===item.arm)).length;
+      const div=document.createElement('div');
+      div.className='sched-pool-item';
+      div.draggable=true;
+      div.innerHTML=`<span class="tag ${arm==='left'?'tl':'tr'}" style="font-size:9px;flex-shrink:0">${arm==='left'?'L':'R'}</span>
+        <span style="flex:1;font-size:11px">${cat.name}</span>
+        <span class="sched-count" style="font-size:14px">${count}</span>`;
+      div.ondragstart=ev=>{
+        dragSrc={type:'pool',idx};
+        ev.dataTransfer.effectAllowed='move';
+        div.classList.add('dragging');
+      };
+      div.ondragend=()=>div.classList.remove('dragging');
+      poolEl.appendChild(div);
+    });
+  }
+
+  // ── Sections
+  const lists=S.T.customSched[arm];
   for(let si=0;si<3;si++){
     const container=$('sched-list-'+si);
+    const dz=$('sched-dz-'+si);
     if(!container)continue;
-    container.className=''; // remove drop-zone class once populated
-    container.innerHTML='';
-    container.ondragover=ev=>schedDragOver(ev,si);
-    container.ondrop=ev=>schedDrop(ev,si);
-    container.ondragleave=ev=>schedDragLeave(ev,si);
-    const items=(lists[si]||[]).filter(item=>{const cat=S.cats.find(c=>c.id===item.cid);return cat&&!cat.hidden;});
-    if(!items.length){
-      container.className='sched-drop-zone';
-      container.textContent='Drop here';
-      continue;
-    }
+    // Remove old items (keep the drop zone element)
+    Array.from(container.children).forEach(ch=>{if(ch.id!=='sched-dz-'+si)ch.remove();});
+
+    const rawItems=(lists[si]||[]);
+    // Filter to only valid (existing, non-hidden) items
+    const items=rawItems.filter(item=>{const cat=S.cats.find(c=>c.id===item.cid);return cat&&!cat.hidden;});
+    // Sync filtered list back
+    lists[si]=items;
+
+    if(dz) dz.style.display=items.length?'none':'flex';
+
     items.forEach((item,idx)=>{
       const cat=S.cats.find(c=>c.id===item.cid)||{name:'?'};
       const count=S.players.filter(p=>(p.entries||[]).some(e=>e.cid===item.cid&&e.arm===item.arm)).length;
       const div=document.createElement('div');
       div.className='sched-item';
       div.draggable=true;
-      div.dataset.si=si;div.dataset.idx=idx;
-      div.innerHTML=`<span class="tag ${item.arm==='left'?'tl':'tr'}" style="font-size:10px;flex-shrink:0">${item.arm==='left'?'L':'R'}</span>
-        <span style="flex:1">${cat.name}</span>
-        <span class="sched-count">${count}</span>`;
+      div.innerHTML=`<span class="tag ${item.arm==='left'?'tl':'tr'}" style="font-size:9px;flex-shrink:0">${item.arm==='left'?'L':'R'}</span>
+        <span style="flex:1;font-size:11px">${cat.name}</span>
+        <span class="sched-count" style="font-size:14px">${count}</span>
+        <button class="sched-item-rm" onclick="removeFromSec(${si},${idx})" title="Return to pool">✕</button>`;
       div.ondragstart=ev=>{
-        dragItem={si,idx};
+        dragSrc={type:'section',si,idx};
         ev.dataTransfer.effectAllowed='move';
-        div.style.opacity='.4';
+        div.classList.add('dragging');
       };
-      div.ondragend=()=>{div.style.opacity='1';};
+      div.ondragend=()=>div.classList.remove('dragging');
       div.ondragover=ev=>{
         ev.preventDefault();ev.stopPropagation();
         div.classList.remove('drag-over-top','drag-over-bot');
@@ -1533,55 +1648,77 @@ function renderSched(){
         const r=div.getBoundingClientRect();
         const before=ev.clientY<r.top+r.height/2;
         div.classList.remove('drag-over-top','drag-over-bot');
-        if(!dragItem)return;
-        moveSchedItem(dragItem.si,dragItem.idx,si,before?idx:idx+1);
+        if(!dragSrc)return;
+        dropOnItem(si,before?idx:idx+1);
       };
-      container.appendChild(div);
+      // Insert before the drop zone
+      if(dz) container.insertBefore(div,dz);
+      else container.appendChild(div);
     });
   }
 }
 
-function ensureCustomSched(){
-  if(!S.T.customSched) S.T.customSched={left:null,right:null};
-  ['left','right'].forEach(arm=>{
-    if(!S.T.customSched[arm]||!S.T.customSched[arm].some(l=>l&&l.length>0)){
-      // Deep clone so left and right arm buckets are fully independent objects
-      const buckets=buildSectionQueues(arm);
-      S.T.customSched[arm]=buckets.map(list=>list.map(item=>({...item})));
-    }
-  });
+function removeFromSec(si,idx){
+  const lists=S.T.customSched[schedArm_];
+  lists[si].splice(idx,1);
+  save();renderSched();
+}
+
+function dropOnItem(toSi,toIdx){
+  if(!dragSrc)return;
+  const lists=S.T.customSched[schedArm_];
+  const pool=poolItems(schedArm_);
+  if(dragSrc.type==='pool'){
+    const item={...pool[dragSrc.idx]};
+    if(!lists[toSi])lists[toSi]=[];
+    lists[toSi].splice(toIdx,0,item);
+  } else {
+    const fromSi=dragSrc.si, fromIdx=dragSrc.idx;
+    const item=lists[fromSi].splice(fromIdx,1)[0];
+    let ti=toIdx;
+    if(fromSi===toSi&&fromIdx<toIdx) ti--;
+    lists[toSi].splice(ti,0,item);
+  }
+  dragSrc=null;
+  save();renderSched();
 }
 
 function schedDragOver(ev,si){
   ev.preventDefault();
-  const c=$('sched-list-'+si);
-  if(c)c.classList.add('drag-over');
+  const dz=$('sched-dz-'+si);
+  if(dz)dz.classList.add('drag-over');
 }
 function schedDragLeave(ev,si){
-  const c=$('sched-list-'+si);
-  if(c)c.classList.remove('drag-over');
+  const dz=$('sched-dz-'+si);
+  if(dz)dz.classList.remove('drag-over');
 }
 function schedDrop(ev,si){
   ev.preventDefault();
-  const c=$('sched-list-'+si);
-  if(c)c.classList.remove('drag-over');
-  if(!dragItem)return;
+  const dz=$('sched-dz-'+si);
+  if(dz)dz.classList.remove('drag-over');
+  if(!dragSrc)return;
   const lists=S.T.customSched[schedArm_];
-  const targetLen=lists[si]?lists[si].length:0;
-  moveSchedItem(dragItem.si,dragItem.idx,si,targetLen);
+  const toIdx=lists[si]?lists[si].length:0;
+  dropOnItem(si,toIdx);
 }
 
-function moveSchedItem(fromSi,fromIdx,toSi,toIdx){
-  const lists=S.T.customSched[schedArm_];
-  const item=lists[fromSi].splice(fromIdx,1)[0];
-  if(fromSi===toSi&&fromIdx<toIdx) toIdx--;
-  lists[toSi].splice(toIdx,0,item);
-  save();renderSched();
+function poolDragOver(ev){
+  ev.preventDefault();
+  $('sched-pool-drop').classList.add('drag-over');
+}
+function poolDragLeave(ev){
+  $('sched-pool-drop').classList.remove('drag-over');
+}
+function poolDrop(ev){
+  ev.preventDefault();
+  $('sched-pool-drop').classList.remove('drag-over');
+  if(!dragSrc||dragSrc.type!=='section')return;
+  removeFromSec(dragSrc.si,dragSrc.idx);
+  dragSrc=null;
 }
 
 function resetSched(){
   if(!S.T.customSched)S.T.customSched={left:null,right:null};
-  // Force rebuild by setting to null, then ensureCustomSched rebuilds from default
   S.T.customSched[schedArm_]=null;
   const buckets=buildSectionQueues(schedArm_);
   S.T.customSched[schedArm_]=buckets.map(list=>list.map(item=>({...item})));
