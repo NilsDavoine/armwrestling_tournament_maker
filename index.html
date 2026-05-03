@@ -124,21 +124,34 @@ tr:hover td{background:rgba(255,255,255,.02)}
 #webcam-canvas{display:none}
 
 /* ── PODIUM ── */
-.podium-wrap{flex:1;display:flex;flex-direction:column;align-items:center;overflow:hidden;padding:10px 6px 0}
-.podium-title{font-family:var(--fd);font-size:20px;font-weight:900;color:var(--green);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
-.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:6px;margin-bottom:6px}
-.podium-slot{display:flex;flex-direction:column;align-items:center;gap:4px}
-.podium-medal{font-size:28px;line-height:1}
-.podium-player-info{text-align:center}
-.podium-pname{font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;line-height:1.1}
-.podium-pfname{font-family:var(--fd);font-size:11px;font-weight:400;color:var(--muted)}
-.podium-block{display:flex;align-items:center;justify-content:center;border:2px solid var(--accent);border-bottom:none;font-family:var(--fd);font-weight:900;color:var(--accent);min-width:70px}
-.podium-block.p1{height:80px;font-size:32px;background:rgba(232,200,64,.08)}
-.podium-block.p2{height:58px;font-size:28px;background:rgba(255,255,255,.04)}
-.podium-block.p3{height:42px;font-size:24px;background:rgba(255,255,255,.02)}
-.podium-next{background:rgba(232,200,64,.07);border:1px solid rgba(232,200,64,.25);border-radius:8px;padding:8px 14px;margin:6px 10px 0;text-align:center}
-.podium-next-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
-.podium-next-name{font-family:var(--fd);font-size:18px;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:1px}
+.podium-outer{display:flex;flex-direction:column;overflow:hidden;flex:1}
+/* TOP THIRD: title + podium stage */
+.podium-top{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:8px 6px 4px;min-height:0}
+.podium-title{font-family:var(--fd);font-size:18px;font-weight:900;color:var(--green);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;text-align:center}
+.podium-stage{display:flex;align-items:flex-end;justify-content:center;gap:4px;width:100%}
+.podium-slot{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0}
+.podium-medal{font-size:24px;line-height:1}
+.podium-photo{width:58px;height:66px;object-fit:cover;border-radius:6px}
+.podium-photo-ph{width:58px;height:66px;border-radius:6px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--border)}
+.podium-flag{width:30px;height:20px;object-fit:cover;border-radius:2px;border:1px solid var(--border)}
+.podium-pname{font-family:var(--fd);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;line-height:1.1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}
+.podium-pfname{font-family:var(--fd);font-size:10px;font-weight:400;color:var(--muted);text-align:center}
+.podium-block{display:flex;align-items:center;justify-content:center;border:2px solid;border-bottom:none;font-family:var(--fd);font-weight:900;width:100%;max-width:90px}
+.podium-block.p1{height:72px;font-size:30px;border-color:var(--accent);color:var(--accent);background:rgba(232,200,64,.1)}
+.podium-block.p2{height:52px;font-size:26px;border-color:#aaa;color:#aaa;background:rgba(255,255,255,.04)}
+.podium-block.p3{height:38px;font-size:22px;border-color:#cd7f32;color:#cd7f32;background:rgba(205,127,50,.05)}
+/* MIDDLE: next category banner */
+.podium-next-banner{background:rgba(232,200,64,.08);border-top:2px solid rgba(232,200,64,.3);border-bottom:2px solid rgba(232,200,64,.3);padding:10px 12px;text-align:center;flex-shrink:0}
+.podium-next-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:2px}
+.podium-next-name{font-family:var(--fd);font-size:20px;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:1px;line-height:1.1}
+/* BOTTOM THIRD: ranking */
+.podium-rank-section{border-top:1px solid var(--border);padding:6px 10px;flex-shrink:0}
+.podium-rank-title{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.podium-rank-row{display:flex;align-items:center;gap:6px;padding:2px 0;border-top:1px solid rgba(255,255,255,.04);font-size:11px}
+.podium-rank-pos{font-family:var(--fd);font-size:14px;font-weight:700;width:18px;color:var(--muted);flex-shrink:0;text-align:center}
+.podium-rank-pos.r1{color:var(--accent)}.podium-rank-pos.r2{color:#aaa}.podium-rank-pos.r3{color:#cd7f32}
+.podium-rank-name{font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.podium-rank-empty{color:rgba(255,255,255,.12);font-style:italic;font-size:10px}
 
 /* ── SCHEDULE TAB ── */
 .sched-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
@@ -437,7 +450,7 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v11';
+const SK='atm_v12';
 let S=def();
 
 function def(){return{
@@ -1349,52 +1362,80 @@ function tick(){
 // ════════════════════════════════════════════
 function podiumHtml(cs, sec){
   const n=cs?cs.players.length:0;
-  // elim array: [0]=last place, [n-1]=1st place
-  const get=(rank)=>{ // rank 1-based
+  // elim[0]=last place, elim[n-1]=1st place
+  const get=(rank)=>{
     if(!cs)return null;
     const pid=cs.elim[n-rank];
     return pid!=null?S.players.find(x=>x.id===pid):null;
   };
   const p1=get(1),p2=get(2),p3=get(3);
-  const medal=(r)=>r===1?'🥇':r===2?'🥈':'🥉';
-  const pblock=(p,rank)=>{
-    if(!p)return'';
-    const ph=p.photo?`<img style="width:54px;height:62px;object-fit:cover;border-radius:6px;border:2px solid ${rank===1?'var(--accent)':'var(--border)'}" src="${p.photo}">`
-      :`<div style="width:54px;height:62px;border-radius:6px;background:var(--bg3);border:2px solid ${rank===1?'var(--accent)':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:22px">👤</div>`;
-    const fl=p.country?`<img style="width:28px;height:18px;object-fit:cover;border-radius:2px;border:1px solid var(--border)" src="${furl(p.country)}" onerror="this.style.display='none'">`:'';
+
+  // Medal text only — no emoji (avoids rendering issues across screens)
+  const medalColors={1:'var(--accent)',2:'#aaa',3:'#cd7f32'};
+  const medalSymbols={1:'★',2:'②',3:'③'};
+
+  const pSlot=(p,rank)=>{
+    if(!p)return`<div class="podium-slot" style="flex:1"></div>`;
+    const bcolor=medalColors[rank];
+    const photoEl=p.photo
+      ?`<img class="podium-photo" style="border:2px solid ${bcolor}" src="${p.photo}">`
+      :`<div class="podium-photo-ph" style="border:2px solid ${bcolor}">👤</div>`;
+    const flagEl=p.country
+      ?`<img class="podium-flag" src="${furl(p.country)}" onerror="this.style.display='none'">`
+      :'';
     return `<div class="podium-slot">
-      <div class="podium-medal">${medal(rank)}</div>
-      ${ph}
-      ${fl}
-      <div class="podium-player-info">
-        <div class="podium-pname" style="color:${rank===1?'var(--accent)':rank===2?'#ccc':'#cd7f32'}">${p.lastName}</div>
-        <div class="podium-pfname">${p.firstName}</div>
+      <div class="podium-medal" style="color:${bcolor};font-size:22px;font-weight:900;font-family:var(--fd)">
+        ${rank===1?'🏆':rank===2?'🥈':'🥉'}
       </div>
+      ${photoEl}
+      ${flagEl}
+      <div class="podium-pname" style="color:${bcolor}">${p.lastName}</div>
+      <div class="podium-pfname">${p.firstName}</div>
       <div class="podium-block p${rank}">${rank}</div>
     </div>`;
   };
 
-  // Next category name from section queue
-  const sq=S.T.secQueues?S.T.secQueues[sec?S.T.secs.indexOf(sec):0]:null;
+  // Find next queued category for this section
+  const secIdx=sec?S.T.secs.indexOf(sec):0;
+  const sq=S.T.secQueues&&secIdx>=0?S.T.secQueues[secIdx]:null;
   const nextItem=sq&&sq.length>0?sq[0]:null;
   const nextCat=nextItem?S.cats.find(c=>c.id===nextItem.cid):null;
+  const showNext=nextCat&&sec&&sec.waitingAdvance;
 
-  let h=`<div class="podium-wrap">
+  let h=`<div class="podium-outer">`;
+
+  // ── TOP: title + podium stage
+  h+=`<div class="podium-top">
     <div class="podium-title">Category Complete</div>
     <div class="podium-stage">
-      ${pblock(p2,2)}
-      ${pblock(p1,1)}
-      ${pblock(p3,3)}
-    </div>`;
+      ${pSlot(p2,2)}
+      ${pSlot(p1,1)}
+      ${pSlot(p3,3)}
+    </div>
+  </div>`;
 
-  if(nextCat&&sec&&sec.waitingAdvance){
-    h+=`<div class="podium-next">
-      <div class="podium-next-lbl">Next Category</div>
+  // ── MIDDLE: next category banner (only if waiting)
+  if(showNext){
+    h+=`<div class="podium-next-banner">
+      <div class="podium-next-lbl">▶ Next category</div>
       <div class="podium-next-name">${nextCat.name}</div>
     </div>`;
   }
-  h+='</div>';
-  h+=rnkHtml(cs);
+
+  // ── BOTTOM: ranking list (all players)
+  h+=`<div class="podium-rank-section">
+    <div class="podium-rank-title">Ranking</div>`;
+  for(let r=1;r<=Math.min(n,10);r++){
+    const pid=cs.elim[n-r];
+    const rp=S.players.find(x=>x.id===pid);
+    const rc=r===1?'r1':r===2?'r2':r===3?'r3':'';
+    h+=`<div class="podium-rank-row">
+      <span class="podium-rank-pos ${rc}">${r}</span>
+      ${rp?`<span class="podium-rank-name">${rp.lastName} ${rp.firstName}</span>`
+          :`<span class="podium-rank-name podium-rank-empty">—</span>`}
+    </div>`;
+  }
+  h+=`</div></div>`;
   return h;
 }
 
