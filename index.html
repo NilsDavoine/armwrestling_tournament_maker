@@ -450,7 +450,7 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v12';
+const SK='atm_v13';
 let S=def();
 
 function def(){return{
@@ -562,8 +562,8 @@ function buildCountrySel(){
 // Pair left & right categories by matching names so we can show them on one row
 function buildCatCBs(ex){
   const el=$('pcat');el.innerHTML='';
-  const leftCats=S.cats.filter(c=>c.arm==='left');
-  const rightCats=S.cats.filter(c=>c.arm==='right');
+  const leftCats=S.cats.filter(c=>c.arm==='left'&&!c.hidden);
+  const rightCats=S.cats.filter(c=>c.arm==='right'&&!c.hidden);
   // Build unique name list preserving left-arm order, then append right-only names
   const names=[...new Set([...leftCats.map(c=>c.name),...rightCats.map(c=>c.name)])];
   names.forEach(name=>{
@@ -720,13 +720,25 @@ function renderCats(){
   [left,right].forEach((list,side)=>{
     list.forEach((c,i)=>{
       const inUse=S.players.some(p=>(p.entries||[]).some(e=>e.cid===c.id));
+      const hidden=!!c.hidden;
       const ns=c.arm==='left'?'background:#1a3a5c;color:var(--a2)':'background:#3a1a1a;color:#ff8888';
+      const numStyle=hidden?'background:var(--bg3);color:var(--muted);opacity:.5':ns;
       const div=document.createElement('div');
       div.className='crow';
-      div.innerHTML=`<div class="cnum" style="${ns}">${i+1}</div>
-        <input value="${c.name}" ${S.T.locked?'disabled':''} onchange="updCat(${c.id},this.value)" style="flex:1">
-        <button class="btn btn-r sm" onclick="delCat(${c.id})"
-          ${inUse||S.T.locked?'disabled':''} title="${inUse?'Has players':'Delete'}">✕</button>`;
+      div.style.opacity=hidden?'.5':'1';
+      // Toggle button: eye open = visible, eye closed = hidden
+      const toggleIcon=hidden?'👁' :'🚫';
+      const toggleTitle=hidden?'Show category (currently hidden)':'Hide category (keep but skip in tournament)';
+      div.innerHTML=`
+        <div class="cnum" style="${numStyle}">${i+1}</div>
+        <input value="${c.name}" ${S.T.locked||hidden?'disabled':''} onchange="updCat(${c.id},this.value)"
+          style="flex:1;${hidden?'color:var(--muted);text-decoration:line-through;':''}" >
+        <button class="btn btn-n sm" onclick="toggleHideCat(${c.id})" title="${toggleTitle}"
+          style="${hidden?'color:var(--green)':'color:var(--muted)'}">
+          ${toggleIcon}
+        </button>
+        <button class="btn btn-r sm" onclick="delCat(${c.id})" style="margin-left:2px"
+          ${inUse||S.T.locked?'disabled':''} title="${inUse?'Has players — cannot delete':'Permanently delete'}">✕</button>`;
       $(c.arm==='left'?'cl':'cr').appendChild(div);
     });
   });
@@ -746,6 +758,19 @@ function delCat(id){
   ask('Delete category?','This cannot be undone.',()=>{
     S.cats=S.cats.filter(c=>c.id!==id);save();renderCats();
   });
+}
+
+function toggleHideCat(id){
+  if(S.T.locked){alert('Cannot modify categories while tournament is running.');return;}
+  const c=S.cats.find(x=>x.id===id);
+  if(!c)return;
+  c.hidden=!c.hidden;
+  // If hiding a category, also reset customSched so it gets rebuilt without this cat
+  if(S.T.customSched){
+    S.T.customSched.left=null;
+    S.T.customSched.right=null;
+  }
+  save();renderCats();renderAdm(); // refresh counts too
 }
 
 // ════════════════════════════════════════════
@@ -880,7 +905,7 @@ function prefSec(groupIdx){ return groupIdx % 3; }
 // for that section, and overflow items are appended to the shared queue.
 function catList(arm){
   const cats=S.cats
-    .filter(c=>c.arm===arm)
+    .filter(c=>c.arm===arm&&!c.hidden)
     .filter(c=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===c.id&&e.arm===arm)));
   // Sort by group then by original order within group
   cats.sort((a,b)=>{
@@ -999,8 +1024,13 @@ function renderCatCounts(){
     const cats=S.cats.filter(c=>c.arm===arm);
     if(!cats.length){el.innerHTML='<div style="color:var(--muted);font-size:12px">No categories</div>';return;}
     el.innerHTML=cats.map(cat=>{
+      if(cat.hidden){
+        return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);opacity:.35">
+          <div style="flex:1;font-size:12px;color:var(--muted);text-decoration:line-through">${cat.name}</div>
+          <div style="font-size:10px;color:var(--muted);font-style:italic">hidden</div>
+        </div>`;
+      }
       const count=S.players.filter(p=>(p.entries||[]).some(e=>e.cid===cat.id&&e.arm===arm)).length;
-      const bar=count>0?`<div style="background:${arm==='left'?'var(--a2)':'#ff7070'};height:4px;border-radius:2px;width:${Math.min(count*8,100)}%;margin-top:3px;opacity:.5"></div>`:'';
       return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
         <div style="flex:1;font-size:12px;color:${count>0?'var(--text)':'var(--muted)'}">${cat.name}</div>
         <div style="font-family:var(--fd);font-size:18px;font-weight:700;color:${count>0?'var(--accent)':'var(--muted)'};min-width:28px;text-align:right">${count}</div>
@@ -1469,7 +1499,7 @@ function renderSched(){
     container.ondragover=ev=>schedDragOver(ev,si);
     container.ondrop=ev=>schedDrop(ev,si);
     container.ondragleave=ev=>schedDragLeave(ev,si);
-    const items=lists[si]||[];
+    const items=(lists[si]||[]).filter(item=>{const cat=S.cats.find(c=>c.id===item.cid);return cat&&!cat.hidden;});
     if(!items.length){
       container.className='sched-drop-zone';
       container.textContent='Drop here';
