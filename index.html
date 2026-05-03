@@ -223,6 +223,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
           </div>
         </div>
       </div>
+      <!-- Filter bar — shown when a category filter is active -->
+      <div id="filter-bar" style="display:none;align-items:center;gap:10px;background:rgba(232,200,64,.07);border:1px solid rgba(232,200,64,.25);border-radius:6px;padding:8px 12px;margin-bottom:10px"></div>
+
       <div class="tbar">
         <button class="btn btn-y" onclick="openAdd()">+ Add Player</button>
         <button class="btn btn-n" onclick="doExportCSV()">⬇ Export CSV</button>
@@ -497,7 +500,7 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v16';
+const SK='atm_v19';
 let S=def();
 
 function def(){return{
@@ -569,9 +572,11 @@ window.addEventListener('DOMContentLoaded',()=>{
   if(isDsp()){
     document.getElementById('A').style.display='none';
     document.getElementById('D').style.display='flex';
-    // Re-read localStorage every second — handles initial load AND missed BroadcastChannel messages
     renderDsp();tick();initScan();
-    setInterval(()=>{ load(); renderDsp(); }, 1000);
+    // No polling — BroadcastChannel handles live updates instantly.
+    // One-time retry after 2s handles the case where the window opened
+    // before the admin had saved state (BroadcastChannel not yet ready).
+    setTimeout(()=>{ load(); renderDsp(); }, 2000);
   } else {
     buildCountrySel();
     renderAdm();
@@ -726,20 +731,77 @@ function delPlayer(id){
   });
 }
 
+// activeFilter = null | {cid, arm, name} — filters the player table by category
+let activeFilter=null;
+
+function setFilter(cid, arm){
+  const cat=S.cats.find(c=>c.id===cid);
+  if(activeFilter&&activeFilter.cid===cid&&activeFilter.arm===arm){
+    // Clicking same filter again clears it
+    activeFilter=null;
+  } else {
+    activeFilter={cid, arm, name:(cat?cat.name:'?')+' ['+arm[0].toUpperCase()+']'};
+  }
+  renderTable();
+  renderCatCounts(); // re-render to update button highlight
+}
+
+function clearFilter(){
+  activeFilter=null;
+  renderTable();
+  renderCatCounts();
+}
+
 function renderTable(){
   const tb=$('ptb');
-  $('plbl').textContent=S.players.length+' player'+(S.players.length!==1?'s':'');
-  if(!S.players.length){
-    tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">No players yet. Click "+ Add Player".</td></tr>';return;
+
+  // Filter indicator bar
+  const bar=$('filter-bar');
+  if(bar){
+    if(activeFilter){
+      bar.style.display='flex';
+      bar.innerHTML=`<span style="font-size:12px;color:var(--text)">
+        Filtered by: <b style="color:var(--accent)">${activeFilter.name}</b>
+      </span>
+      <button class="btn btn-n sm" onclick="clearFilter()" style="margin-left:auto;padding:3px 10px">✕ Clear filter</button>`;
+    } else {
+      bar.style.display='none';
+    }
   }
-  tb.innerHTML=S.players.map(p=>{
+
+  // Apply filter
+  let players=S.players;
+  if(activeFilter){
+    players=players.filter(p=>(p.entries||[]).some(e=>e.cid===activeFilter.cid&&e.arm===activeFilter.arm));
+  }
+
+  // Count label
+  const lbl=$('plbl');
+  if(lbl){
+    if(activeFilter){
+      lbl.textContent=players.length+' / '+S.players.length+' players';
+    } else {
+      lbl.textContent=S.players.length+' player'+(S.players.length!==1?'s':'');
+    }
+  }
+
+  if(!players.length){
+    tb.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px">${
+      activeFilter?'No players in this category.':'No players yet. Click "+ Add Player".'
+    }</td></tr>`;
+    return;
+  }
+  tb.innerHTML=players.map(p=>{
     const ph=p.photo?`<img class="th" src="${p.photo}">`:`<div class="thp">👤</div>`;
     const fl=p.country?`<img class="fi" src="${furl(p.country)}" onerror="this.style.display='none'"> `:'';
     const cn=CC.find(x=>x.c===p.country);
     const ctags=(p.entries||[]).map(e=>{
       const cat=S.cats.find(c=>c.id===e.cid)||{name:'?',arm:'left'};
       const al=e.arm==='left'?'L':'R';
-      return `<span class="tag ${e.arm==='left'?'tl':'tr'}" style="margin:1px 2px 1px 0">${cat.name} [${al}]</span>`;
+      // Highlight the active filter category tag
+      const isActive=activeFilter&&e.cid===activeFilter.cid&&e.arm===activeFilter.arm;
+      return `<span class="tag ${e.arm==='left'?'tl':'tr'}"
+        style="margin:1px 2px 1px 0;${isActive?'outline:1px solid var(--accent);':''}">${cat.name} [${al}]</span>`;
     }).join('')||'—';
     return `<tr>
       <td><span class="bc">${p.bc}</span></td>
@@ -795,21 +857,21 @@ function renderCats(){
   });
 }
 
-function updCat(id,v){const c=S.cats.find(x=>x.id===id);if(c){c.name=v;save();}}
+function updCat(id,v){const c=S.cats.find(x=>x.id===id);if(c){c.name=v;save();renderAdm();}}
 
 function addCat(arm){
   if(S.T.locked){alert('Cannot modify categories while tournament is running.');return;}
   S.cats.push({id:S.cid++,arm,name:'New Category'});
   // Reset customSched so new cat appears in pool on next renderSched
   if(S.T.customSched){S.T.customSched.left=null;S.T.customSched.right=null;}
-  save();renderCats();
+  save();renderCats();renderAdm();
 }
 
 function delCat(id){
   if(S.T.locked){alert('Cannot modify categories while tournament is running.');return;}
   if(S.players.some(p=>(p.entries||[]).some(e=>e.cid===id))){alert('This category has registered players. Remove them first.');return;}
   ask('Delete category?','This cannot be undone.',()=>{
-    S.cats=S.cats.filter(c=>c.id!==id);save();renderCats();
+    S.cats=S.cats.filter(c=>c.id!==id);save();renderCats();renderAdm();
   });
 }
 
@@ -1084,9 +1146,17 @@ function renderCatCounts(){
         </div>`;
       }
       const count=S.players.filter(p=>(p.entries||[]).some(e=>e.cid===cat.id&&e.arm===arm)).length;
-      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
+      const isActive=activeFilter&&activeFilter.cid===cat.id&&activeFilter.arm===arm;
+      const btnStyle=isActive
+        ?'background:var(--accent);color:#000;border-color:var(--accent)'
+        :'color:var(--muted)';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);${isActive?'background:rgba(232,200,64,.05);margin:0 -4px;padding:4px 4px;border-radius:4px':''}">
         <div style="flex:1;font-size:12px;color:${count>0?'var(--text)':'var(--muted)'}">${cat.name}</div>
-        <div style="font-family:var(--fd);font-size:18px;font-weight:700;color:${count>0?'var(--accent)':'var(--muted)'};min-width:28px;text-align:right">${count}</div>
+        <div style="font-family:var(--fd);font-size:16px;font-weight:700;color:${count>0?'var(--accent)':'var(--muted)'};min-width:22px;text-align:right">${count}</div>
+        <button onclick="setFilter(${cat.id},'${arm}')" title="${isActive?'Clear filter':'Show only these players'}"
+          class="btn btn-n sm" style="padding:2px 8px;font-size:11px;${btnStyle}">
+          ${isActive?'✕':'▼'}
+        </button>
       </div>`;
     }).join('');
   });
