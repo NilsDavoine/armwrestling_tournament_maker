@@ -85,9 +85,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .abl{background:#1a3a5c;color:var(--a2)}.abr{background:#3a1a1a;color:#ff8888}
 .db{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);overflow:hidden}
 .ds{background:#0d0f15;display:flex;flex-direction:column;overflow:hidden}
-.dsh{background:#13161e;padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
-.dshn{font-family:var(--fd);font-size:22px;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:1px}
-.dshs{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.dsh{background:#13161e;padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0;text-align:center}
+.dshn{font-family:var(--fd);font-size:22px;font-weight:900;color:var(--accent);text-transform:uppercase;letter-spacing:1px;text-align:center}
+.dshs{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;text-align:center}
 .dsm{flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:16px 10px}
 .dsp{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;min-width:0;padding:0 4px}
 .dspho{width:88px;height:100px;object-fit:cover;border-radius:8px;border:2px solid var(--border)}
@@ -437,7 +437,7 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v10';
+const SK='atm_v11';
 let S=def();
 
 function def(){return{
@@ -915,12 +915,14 @@ function fillSec(si,item){
 // Launch an arm: fill 3 sections with the first item of each section bucket,
 // store per-section queues so advSec pulls from the right bucket.
 function launchArm(arm){
-  // Use custom schedule if defined, otherwise use default ordering
+  // Use custom schedule if it exists and has at least one category assigned
   let buckets;
-  if(S.T.customSched&&S.T.customSched[arm]){
+  const custom=S.T.customSched&&S.T.customSched[arm];
+  const customHasItems=custom&&custom.some(list=>list&&list.length>0);
+  if(customHasItems){
     // Filter out categories that have no players (may have changed since schedule was set)
-    buckets=S.T.customSched[arm].map(list=>
-      list.filter(item=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===item.cid&&e.arm===item.arm)))
+    buckets=custom.map(list=>
+      (list||[]).filter(item=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===item.cid&&e.arm===item.arm)))
     );
   } else {
     buckets=buildSectionQueues(arm);
@@ -1430,7 +1432,7 @@ function renderSched(){
     if(!items.length){
       container.className='sched-drop-zone';
       container.textContent='Drop here';
-      return;
+      continue;
     }
     items.forEach((item,idx)=>{
       const cat=S.cats.find(c=>c.id===item.cid)||{name:'?'};
@@ -1471,9 +1473,10 @@ function renderSched(){
 function ensureCustomSched(){
   if(!S.T.customSched) S.T.customSched={left:null,right:null};
   ['left','right'].forEach(arm=>{
-    if(!S.T.customSched[arm]){
+    if(!S.T.customSched[arm]||!S.T.customSched[arm].some(l=>l&&l.length>0)){
+      // Deep clone so left and right arm buckets are fully independent objects
       const buckets=buildSectionQueues(arm);
-      S.T.customSched[arm]=buckets;
+      S.T.customSched[arm]=buckets.map(list=>list.map(item=>({...item})));
     }
   });
 }
@@ -1507,8 +1510,10 @@ function moveSchedItem(fromSi,fromIdx,toSi,toIdx){
 
 function resetSched(){
   if(!S.T.customSched)S.T.customSched={left:null,right:null};
+  // Force rebuild by setting to null, then ensureCustomSched rebuilds from default
   S.T.customSched[schedArm_]=null;
-  ensureCustomSched();
+  const buckets=buildSectionQueues(schedArm_);
+  S.T.customSched[schedArm_]=buckets.map(list=>list.map(item=>({...item})));
   save();renderSched();
 }
 
