@@ -497,7 +497,7 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v14';
+const SK='atm_v16';
 let S=def();
 
 function def(){return{
@@ -776,10 +776,14 @@ function renderCats(){
       // Toggle button: eye open = visible, eye closed = hidden
       const toggleIcon=hidden?'👁' :'🚫';
       const toggleTitle=hidden?'Show category (currently hidden)':'Hide category (keep but skip in tournament)';
+      // Count players registered in this category for this specific arm
+      const count=S.players.filter(p=>(p.entries||[]).some(e=>e.cid===c.id&&e.arm===c.arm)).length;
+      const countColor=count>0?'var(--accent)':'var(--muted)';
       div.innerHTML=`
         <div class="cnum" style="${numStyle}">${i+1}</div>
         <input value="${c.name}" ${S.T.locked||hidden?'disabled':''} onchange="updCat(${c.id},this.value)"
           style="flex:1;${hidden?'color:var(--muted);text-decoration:line-through;':''}" >
+        <div style="font-family:var(--fd);font-size:18px;font-weight:900;color:${countColor};min-width:28px;text-align:center;flex-shrink:0">${hidden?'—':count}</div>
         <button class="btn btn-n sm" onclick="toggleHideCat(${c.id})" title="${toggleTitle}"
           style="${hidden?'color:var(--green)':'color:var(--muted)'}">
           ${toggleIcon}
@@ -796,6 +800,8 @@ function updCat(id,v){const c=S.cats.find(x=>x.id===id);if(c){c.name=v;save();}}
 function addCat(arm){
   if(S.T.locked){alert('Cannot modify categories while tournament is running.');return;}
   S.cats.push({id:S.cid++,arm,name:'New Category'});
+  // Reset customSched so new cat appears in pool on next renderSched
+  if(S.T.customSched){S.T.customSched.left=null;S.T.customSched.right=null;}
   save();renderCats();
 }
 
@@ -1545,11 +1551,11 @@ function ensureCustomSched(){
   });
 }
 
-// Returns all valid {cid,arm} items for this arm (active cats with players, not hidden)
+// Returns all valid {cid,arm} items for this arm (active, not hidden) — including empty categories
+// so newly added categories immediately appear in the pool even before players register
 function allSchedItems(arm){
   return S.cats
     .filter(c=>c.arm===arm&&!c.hidden)
-    .filter(c=>S.players.some(p=>(p.entries||[]).some(e=>e.cid===c.id&&e.arm===arm)))
     .map(c=>({cid:c.id,arm}));
 }
 
