@@ -198,6 +198,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <button class="btn btn-n" onclick="openDisplay()">📺 Open Display</button>
     <button class="btn btn-g" id="hdr-start" style="display:none" onclick="startTournament()">▶ Start</button>
     <button class="btn btn-r" id="hdr-reset" style="display:none" onclick="resetTournament()">↺ Reset</button>
+    <button class="btn btn-n" onclick="factoryReset()" title="Wipe everything — players, matches, categories — back to factory defaults" style="margin-left:8px;color:var(--muted);border-color:var(--border);font-size:11px">🗑 Factory Reset</button>
   </div>
   <div class="tabs">
     <div class="tab on" onclick="showTab('reg')">Registrations</div>
@@ -500,7 +501,7 @@ const furl=c=>`https://flagcdn.com/w40/${c.toLowerCase()}.png`;
 // T: {phase,curArm,locked,queue:[{cid,arm}],secs:[{cid,arm,key,done}|null],done:[]}
 // CS: {"cid_arm":{cid,arm,players,wq,lq,elim,cur,hist,done}}
 // ════════════════════════════════════════════
-const SK='atm_v19';
+const SK='atm_v20';
 let S=def();
 
 function def(){return{
@@ -1119,6 +1120,31 @@ function resetTournament(){
     S.CS={};S._rlist=null;S.log=[];
     save();renderAdm();
   });
+}
+
+function factoryReset(){
+  ask('Factory Reset?',
+    'This will permanently erase EVERYTHING — all players, all categories, all match data — and restore the app to its original state. This cannot be undone.',
+    ()=>{
+      // Wipe localStorage and reload fresh
+      try{ localStorage.removeItem(SK); }catch(e){}
+      S=def();
+      activeFilter=null;
+      save();
+      // Re-init UI fully
+      buildCountrySel();
+      renderAdm();
+      renderCats();
+      showTab('reg');
+      // Broadcast to display so it resets too
+      if(ch) ch.postMessage({t:'sync',d:JSON.stringify(S)});
+    }
+  );
+  // Make the confirm button red to signal danger
+  setTimeout(()=>{
+    const ok=$('cfok');
+    if(ok) ok.style.background='var(--red)';
+  },10);
 }
 
 // Manual win button from ctrl tab
