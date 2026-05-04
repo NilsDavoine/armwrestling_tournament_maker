@@ -249,6 +249,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
       <div class="tbar">
         <button class="btn btn-y" onclick="openAdd()">+ Add Player</button>
+        <button class="btn btn-n" onclick="document.getElementById('import-file').click()">⬆ Import Registrations</button>
         <button class="btn btn-n" onclick="doExportCSV()">⬇ Export CSV</button>
         <button class="btn btn-n" onclick="openBarcodes()">🪪 Print Badges</button>
         <button class="btn btn-b" onclick="genBulk()" title="Generate multiple random test players">🎲 Generate test players</button>
@@ -506,6 +507,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 </div>
 <!-- Hidden print sheet — only shown during print -->
 <div id="print-sheet" style="display:none"></div>
+<input type="file" id="import-file" accept=".csv,text/csv" style="display:none" onchange="handleImportFile(event)">
 
 <script>
 // ════════════════════════════════════════════
@@ -1718,6 +1720,160 @@ function printBadges(){
     </div>
   </div>`;
   window.print();
+}
+
+
+// ════════════════════════════════════════════
+// CSV IMPORT FROM PUBLIC REGISTRATION SHEET
+// Expected Google Sheet headers:
+// timestamp, firstName, lastName, email, countryCode, countryName,
+// clubName, clubContact, categoriesHuman, entriesJSON, acceptedTerms,
+// marketingConsent, suggestions
+// ════════════════════════════════════════════
+function parseCSV(text){
+  const rows=[];
+  let row=[], cell='', q=false;
+  text=String(text||'').replace(/^\uFEFF/,'');
+  for(let i=0;i<text.length;i++){
+    const ch=text[i], nx=text[i+1];
+    if(q){
+      if(ch==='"'&&nx==='"'){cell+='"';i++;}
+      else if(ch==='"'){q=false;}
+      else{cell+=ch;}
+    }else{
+      if(ch==='"')q=true;
+      else if(ch===','){row.push(cell);cell='';}
+      else if(ch==='\n'){
+        row.push(cell);rows.push(row);row=[];cell='';
+      }else if(ch==='\r'){
+        // ignore CR, LF will close the row
+      }else{cell+=ch;}
+    }
+  }
+  row.push(cell);
+  if(row.some(v=>String(v).trim()!==''))rows.push(row);
+  return rows;
+}
+
+function normalizeHeader(h){
+  return String(h||'').trim().replace(/^\uFEFF/,'').toLowerCase();
+}
+
+function parseEntriesJSON(raw, categoriesHuman){
+  let entries=[];
+  raw=String(raw||'').trim();
+  if(raw){
+    try{
+      const parsed=JSON.parse(raw);
+      if(Array.isArray(parsed)){
+        entries=parsed.map(e=>({cid:Number(e.cid),arm:e.arm})).filter(e=>Number.isFinite(e.cid)&&(e.arm==='left'||e.arm==='right'));
+      }
+    }catch(err){
+      console.warn('Could not parse entriesJSON:', raw, err);
+    }
+  }
+
+  // Fallback: parse human field like "Amateurs -75kg (LEFT); Senior Pro -85kg (RIGHT)"
+  if(!entries.length && categoriesHuman){
+    String(categoriesHuman).split(';').forEach(part=>{
+      const m=part.trim().match(/^(.*?)\s*\((LEFT|RIGHT|L|R)\)\s*$/i);
+      if(!m)return;
+      const name=m[1].trim();
+      const arm=/^(LEFT|L)$/i.test(m[2])?'left':'right';
+      const cat=S.cats.find(c=>c.arm===arm&&c.name.toLowerCase()===name.toLowerCase());
+      if(cat)entries.push({cid:cat.id,arm});
+    });
+  }
+  return entries;
+}
+
+function handleImportFile(event){
+  const file=event.target.files&&event.target.files[0];
+  if(!file)return;
+
+  if(S.T.locked){
+    alert('Registrations are locked. Reset the tournament before importing players.');
+    event.target.value='';
+    return;
+  }
+
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const text=e.target.result;
+    const rows=parseCSV(text);
+    if(rows.length<2){alert('No registration rows found in this CSV.');event.target.value='';return;}
+
+    const headers=rows[0].map(normalizeHeader);
+    const idx=name=>headers.indexOf(name.toLowerCase());
+    const get=(row,name)=>{
+      const i=idx(name);
+      return i>=0?String(row[i]||'').trim():'';
+    };
+
+    const required=['firstname','lastname','countrycode','entriesjson'];
+    const missingHeaders=required.filter(h=>idx(h)===-1);
+    if(missingHeaders.length){
+      alert('Missing CSV column(s): '+missingHeaders.join(', ')+'. Export the registration Google Sheet as CSV with the original headers.');
+      event.target.value='';
+      return;
+    }
+
+    let imported=0, skipped=0, bad=0;
+    const skippedNames=[];
+
+    rows.slice(1).forEach((row,rowIndex)=>{
+      if(!row.some(v=>String(v||'').trim()!==''))return;
+
+      const firstName=get(row,'firstName');
+      const lastName=get(row,'lastName').toUpperCase();
+      const country=get(row,'countryCode').toUpperCase();
+      const email=get(row,'email');
+      const categoriesHuman=get(row,'categoriesHuman');
+      const entries=parseEntriesJSON(get(row,'entriesJSON'),categoriesHuman);
+
+      if(!firstName||!lastName||!entries.length){
+        bad++;
+        console.warn('Skipped invalid registration row',rowIndex+2,row);
+        return;
+      }
+
+      // Avoid duplicate imports. Email is stored as extra metadata when available.
+      const duplicate=S.players.some(p=>
+        (email&&p.email&&String(p.email).toLowerCase()===email.toLowerCase()) ||
+        (String(p.lastName||'').toUpperCase()===lastName && String(p.firstName||'').trim().toLowerCase()===firstName.toLowerCase() && String(p.country||'').toUpperCase()===country)
+      );
+      if(duplicate){
+        skipped++;
+        skippedNames.push(lastName+' '+firstName);
+        return;
+      }
+
+      S.players.push({
+        id:S.pid++,
+        bc:String(S.bid++),
+        lastName,
+        firstName,
+        country,
+        photo:null,
+        entries:entries.map(e=>({cid:e.cid,arm:e.arm})),
+        email,
+        clubName:get(row,'clubName'),
+        clubContact:get(row,'clubContact'),
+        importedAt:new Date().toISOString()
+      });
+      imported++;
+    });
+
+    save();
+    renderAdm();
+    event.target.value='';
+
+    let msg=`Import complete.\n\nImported: ${imported}\nSkipped duplicates: ${skipped}\nInvalid rows: ${bad}`;
+    if(skippedNames.length)msg+='\n\nDuplicates skipped:\n- '+skippedNames.slice(0,10).join('\n- ')+(skippedNames.length>10?'\n...':'');
+    alert(msg);
+  };
+  reader.onerror=()=>{alert('Could not read CSV file.');event.target.value='';};
+  reader.readAsText(file);
 }
 
 // ════════════════════════════════════════════
